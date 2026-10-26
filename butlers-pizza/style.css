@@ -6,6 +6,7 @@
     --text-dark: #1e1e1e;
     --accent-red: #d13014;
     --font-main: Arial, sans-serif;
+    --sticky-header-height: 76px;
 }
 
 * {
@@ -107,8 +108,10 @@ body {
 /* HERO SECTION */
 .hero-section {
     display: flex;
-    position: relative;
-    min-height: 500px;
+    position: sticky;
+    top: var(--sticky-header-height);
+    z-index: 1;
+    min-height: 560px;
     overflow: hidden;
     background-color: var(--bg-hero-yellow);
     background-image:
@@ -253,6 +256,7 @@ body {
 /* MENU SECTION */
 .menu-section {
     position: relative;
+    z-index: 3;
     background-color: var(--bg-menu-cream);
     padding: 60px 40px;
 }
@@ -262,7 +266,6 @@ body {
     left: 0;
     width: 100%;
     height: 35px;
-    overflow: hidden;
     color: var(--bg-menu-cream);
     line-height: 0;
     z-index: 2;
@@ -276,10 +279,12 @@ body {
 
 .top-edge {
     top: -34px;
+    filter: drop-shadow(0 -8px 9px rgba(35, 34, 32, 0.55));
 }
 
 .bottom-edge {
     bottom: -34px;
+    filter: drop-shadow(0 8px 9px rgba(35, 34, 32, 0.55));
 }
 
 .section-divider-logo {
@@ -409,7 +414,7 @@ body {
         linear-gradient(rgba(244, 171, 46, 0.84), rgba(244, 171, 46, 0.84)),
         url("assets/butlers-brick-wall.jpg");
     background-position: center;
-    background-size: cover;
+    background-size: cover, auto 108%;
 }
 
 .about-intro h1,
@@ -450,6 +455,8 @@ body {
 
 /* FOOTER SECTION */
 .site-footer {
+    position: relative;
+    z-index: 2;
     background-color: var(--bg-footer-dark);
     background-image:
         linear-gradient(rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.42)),
@@ -458,6 +465,7 @@ body {
     background-size: cover;
     color: #f4efdb;
     padding: 60px 40px;
+    box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.5);
 }
 
 .footer-content-wrapper {
@@ -554,6 +562,12 @@ body {
 
     .hero-section {
         flex-direction: column;
+        padding-bottom: 50px;
+    }
+
+    .quote-section,
+    .hero-right {
+        flex: none;
     }
 
     .quote-section {
@@ -592,6 +606,10 @@ body {
 }
 
 @media (max-width: 600px) {
+    :root {
+        --sticky-header-height: 113px;
+    }
+
     .site-header {
         grid-template-columns: 1fr auto;
         align-items: center;
