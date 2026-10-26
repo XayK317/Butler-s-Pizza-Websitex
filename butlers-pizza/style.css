@@ -110,7 +110,7 @@ body {
     display: flex;
     position: sticky;
     top: var(--sticky-header-height);
-    z-index: 1;
+    z-index: 3;
     min-height: 560px;
     overflow: hidden;
     background-color: var(--bg-hero-yellow);
@@ -256,7 +256,7 @@ body {
 /* MENU SECTION */
 .menu-section {
     position: relative;
-    z-index: 3;
+    z-index: 4;
     background-color: var(--bg-menu-cream);
     padding: 60px 40px;
 }
@@ -466,6 +466,22 @@ body {
     color: #f4efdb;
     padding: 60px 40px;
     box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.footer-reveal-stage {
+    position: relative;
+    z-index: 2;
+    height: 420px;
+}
+
+.footer-reveal-stage .site-footer {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    z-index: 0;
+    width: min(100%, 1200px);
+    transform: translateX(-50%);
+    clip-path: inset(var(--footer-reveal-clip, 50%) 0 0 0);
 }
 
 .footer-content-wrapper {

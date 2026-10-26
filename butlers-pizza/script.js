@@ -1,4 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const footerStage = document.querySelector(".footer-reveal-stage");
+    const footer = footerStage?.querySelector(".site-footer");
+    const menu = document.querySelector("#menu");
+
+    if (footerStage && footer && menu) {
+        const updateFooterReveal = () => {
+            const menuBottom = menu.getBoundingClientRect().bottom + window.scrollY;
+            const footerTop = Math.max(0, window.innerHeight - footer.offsetHeight);
+            const revealStart = Math.max(0, menuBottom - window.innerHeight);
+            const revealEnd = Math.max(revealStart + 1, menuBottom - footerTop);
+            const revealProgress = Math.max(
+                0,
+                Math.min(1, (window.scrollY - revealStart) / (revealEnd - revealStart))
+            );
+            footer.style.setProperty("--footer-reveal-clip", `${(1 - revealProgress) * 50}%`);
+        };
+
+        const updateFooterStageHeight = () => {
+            footerStage.style.height = `${footer.offsetHeight}px`;
+            updateFooterReveal();
+        };
+        updateFooterStageHeight();
+
+        const resizeObserver = new ResizeObserver(updateFooterStageHeight);
+        resizeObserver.observe(footer);
+        window.addEventListener("scroll", updateFooterReveal, { passive: true });
+        window.addEventListener("resize", updateFooterReveal);
+    }
+
     document.querySelectorAll("[data-carousel]").forEach((carousel) => {
         const slides = Array.from(carousel.querySelectorAll(".carousel-slide"));
         const indicators = Array.from(carousel.querySelectorAll("[data-carousel-slide]"));
