@@ -31,6 +31,9 @@ body {
 
 /* HEADER / NAVBAR */
 .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
@@ -41,6 +44,7 @@ body {
         url("assets/weathered-gray-wood.png");
     background-position: center 38%;
     background-size: cover;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }
 
 .brand-logo {
@@ -106,20 +110,20 @@ body {
     position: relative;
     min-height: 500px;
     overflow: hidden;
-}
-
-.hero-left {
-    flex: 1;
-    padding: 60px 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     background-color: var(--bg-hero-yellow);
     background-image:
         linear-gradient(rgba(244, 171, 46, 0.84), rgba(244, 171, 46, 0.84)),
         url("assets/butlers-brick-wall.jpg");
     background-position: center;
     background-size: cover;
+}
+
+.quote-section {
+    flex: 1;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .hero-title {
@@ -130,30 +134,120 @@ body {
     letter-spacing: -1px;
 }
 
+.media-cta {
+    display: inline-block;
+    align-self: center;
+    margin: 14px 0 18px;
+    padding: 12px 20px;
+    border: 2px solid var(--text-dark);
+    color: var(--text-dark);
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.media-cta:hover {
+    color: var(--bg-menu-cream);
+    background-color: var(--text-dark);
+}
+
 .hero-right {
     flex: 1;
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     min-width: 0;
 }
 
 .hero-image-placeholder {
+    position: relative;
     width: 100%;
-    min-height: 100%;
-    background-color: #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-weight: bold;
-    border-left: 8px solid var(--bg-menu-cream);
+    aspect-ratio: 4 / 3;
+    background: transparent;
+    overflow: hidden;
+    border: 5px solid var(--text-dark);
+    border-radius: 10px;
+    box-shadow:
+        0 0 0 3px var(--accent-red),
+        0 10px 24px rgba(30, 30, 30, 0.28);
 }
 
-.hero-image-placeholder img {
+.hero-image-placeholder .carousel-slide {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
-    min-height: 500px;
     object-fit: cover;
+}
+
+.hero-image-placeholder .carousel-slide[hidden] {
+    display: none;
+}
+
+.carousel-controls {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.carousel-arrow,
+.carousel-indicator {
+    border: 2px solid var(--bg-menu-cream);
+    color: var(--bg-menu-cream);
+    background: rgb(0 0 0 / 60%);
+    cursor: pointer;
+}
+
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 30px;
+    line-height: 1;
+    transform: translateY(-50%);
+    pointer-events: auto;
+}
+
+.carousel-arrow[data-carousel-previous] {
+    left: 18px;
+}
+
+.carousel-arrow[data-carousel-next] {
+    right: 18px;
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    display: flex;
+    gap: 10px;
+    transform: translateX(-50%);
+    pointer-events: auto;
+}
+
+.carousel-indicator {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.carousel-indicator.is-active {
+    background: var(--bg-menu-cream);
+}
+
+.carousel-arrow:focus-visible,
+.carousel-indicator:focus-visible,
+.media-cta:focus-visible {
+    outline: 3px solid var(--accent-red);
+    outline-offset: 3px;
 }
 
 /* MENU SECTION */
@@ -163,42 +257,36 @@ body {
     padding: 60px 40px;
 }
 
-.menu-section::before,
-.menu-section::after {
+.torn-edge {
     position: absolute;
     left: 0;
     width: 100%;
-    height: 52px;
-    background-color: var(--bg-menu-cream);
-    mask-image: url("assets/torn-paper-edge.svg");
-    mask-position: bottom;
-    mask-repeat: no-repeat;
-    mask-size: 100% 100%;
-    -webkit-mask-image: url("assets/torn-paper-edge.svg");
-    -webkit-mask-position: bottom;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-size: 100% 100%;
-    filter:
-        drop-shadow(0 -5px 3px rgba(35, 34, 32, 0.42))
-        drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.8));
-    content: "";
+    height: 35px;
+    overflow: hidden;
+    color: var(--bg-menu-cream);
+    line-height: 0;
+    z-index: 2;
     pointer-events: none;
 }
 
-.menu-section::before {
-    top: -50px;
+.torn-edge svg {
+    width: 100%;
+    height: 100%;
 }
 
-.menu-section::after {
-    bottom: -50px;
-    transform: rotate(180deg);
+.top-edge {
+    top: -34px;
+}
+
+.bottom-edge {
+    bottom: -34px;
 }
 
 .section-divider-logo {
     position: absolute;
     top: 0;
     left: 25%;
-    z-index: 1;
+    z-index: 3;
     width: 378px;
     aspect-ratio: 3 / 2;
     background-color: var(--accent-red);
@@ -309,6 +397,57 @@ body {
     margin-left: 20px;
 }
 
+/* ABOUT / MEDIA PAGE */
+.about-intro {
+    min-height: 45vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 70px 10%;
+    background-color: var(--bg-hero-yellow);
+    background-image:
+        linear-gradient(rgba(244, 171, 46, 0.84), rgba(244, 171, 46, 0.84)),
+        url("assets/butlers-brick-wall.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+.about-intro h1,
+.media-section h2 {
+    margin-bottom: 20px;
+    font-size: clamp(38px, 6vw, 64px);
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.about-intro p {
+    max-width: 720px;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.media-section {
+    padding: 60px 40px 80px;
+    background-color: var(--bg-menu-cream);
+}
+
+.media-section h2 {
+    text-align: center;
+}
+
+.media-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.media-gallery img {
+    display: block;
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+}
+
 /* FOOTER SECTION */
 .site-footer {
     background-color: var(--bg-footer-dark);
@@ -417,18 +556,8 @@ body {
         flex-direction: column;
     }
 
-    .hero-left {
+    .quote-section {
         min-height: 300px;
-    }
-
-    .hero-image-placeholder {
-        border-left: 0;
-        border-top: 8px solid var(--bg-menu-cream);
-    }
-
-    .hero-image-placeholder img {
-        min-height: 320px;
-        max-height: 480px;
     }
 
     .menu-columns,
@@ -452,6 +581,14 @@ body {
     .footer-interactive {
         align-items: flex-start;
     }
+
+    .media-gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .media-gallery img {
+        height: 320px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -472,13 +609,26 @@ body {
         font-size: 12px;
     }
 
-    .hero-left {
+    .quote-section {
         min-height: 260px;
         padding: 40px 24px;
     }
 
     .hero-title {
         font-size: clamp(42px, 12vw, 64px);
+    }
+
+    .about-intro,
+    .media-section {
+        padding: 40px 24px;
+    }
+
+    .about-intro p {
+        font-size: 16px;
+    }
+
+    .media-gallery img {
+        height: 240px;
     }
 
     .menu-section,

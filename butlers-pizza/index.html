@@ -19,31 +19,44 @@
             </div>
             <nav class="nav-links">
                 <a href="#menu">MENU</a>
-                <a href="#about">ABOUT</a>
+                <a href="about.html#about">ABOUT / MEDIA</a>
                 <a href="#catering">CATERING</a>
-                <a href="#visit">VISIT</a>
+                <a href="#visit">FAQ</a>
             </nav>
             <a href="#order" class="order-btn">ORDER</a>
         </header>
 
         <!-- HERO SECTION -->
         <section class="hero-section">
-            <div class="hero-left">
+            <div class="quote-section">
                 <h1 class="hero-title">GET LOST IN <br>THE SAUCE</h1>
-                <!-- Placeholder wrapper for vector illustrations / pizza slice graphics -->
-                <div class="hero-graphic-placeholder">
-                    <!-- Drop inline SVG or graphic asset here later -->
-                </div>
             </div>
             <div class="hero-right">
-                <div class="hero-image-placeholder">
-                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Freshly baked pepperoni pizza">
+                <div class="hero-image-placeholder" data-carousel role="region" aria-roledescription="carousel" aria-label="Butler's Pizza food photos">
+                    <img class="carousel-slide" src="assets/media-pizza.webp" alt="Freshly baked cheese pizza" aria-hidden="false">
+                    <img class="carousel-slide" src="assets/media-sandwich.png" alt="Butler's sandwich with melted cheese and vegetables" aria-hidden="true" hidden>
+                    <img class="carousel-slide" src="assets/media-pizza-trays.png" alt="Two baked pizzas in serving trays" aria-hidden="true" hidden>
+                    <div class="carousel-controls">
+                        <button class="carousel-arrow" type="button" data-carousel-previous aria-label="Previous photo">&#8249;</button>
+                        <div class="carousel-indicators" role="group" aria-label="Choose a photo">
+                            <button class="carousel-indicator is-active" type="button" data-carousel-slide="0" aria-label="Show photo 1" aria-current="true"></button>
+                            <button class="carousel-indicator" type="button" data-carousel-slide="1" aria-label="Show photo 2"></button>
+                            <button class="carousel-indicator" type="button" data-carousel-slide="2" aria-label="Show photo 3"></button>
+                        </div>
+                        <button class="carousel-arrow" type="button" data-carousel-next aria-label="Next photo">&#8250;</button>
+                    </div>
                 </div>
+                <a class="media-cta" href="about.html#media">SEE OUR MEDIA</a>
             </div>
         </section>
 
         <!-- MENU / LUNCH SPECIALS SECTION -->
         <section id="menu" class="menu-section">
+            <div class="torn-edge top-edge" aria-hidden="true">
+                <svg viewBox="0 0 1200 45" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0,45 L0,20 L13,17 L19,25 L25,14 L39,20 L44,12 L49,18 L66,16 L73,27 L79,19 L84,22 L91,10 L98,17 L113,14 L119,24 L130,18 L135,28 L141,16 L157,20 L164,11 L169,18 L177,13 L188,23 L194,19 L201,25 L207,12 L214,18 L229,15 L234,21 L242,9 L248,17 L260,20 L266,14 L272,24 L281,18 L294,27 L300,13 L307,19 L314,11 L329,16 L335,25 L341,20 L347,22 L354,10 L361,17 L374,14 L380,23 L390,18 L396,28 L401,15 L417,21 L425,12 L430,19 L438,11 L448,23 L455,17 L461,25 L468,13 L475,18 L489,14 L495,22 L502,8 L508,17 L521,20 L527,13 L533,25 L542,19 L551,28 L557,14 L564,19 L570,10 L586,16 L591,24 L598,20 L605,22 L612,12 L618,18 L633,15 L639,26 L650,19 L656,29 L661,16 L676,21 L683,11 L689,18 L697,14 L707,25 L714,19 L720,24 L728,12 L735,17 L748,14 L754,23 L761,9 L767,18 L779,21 L785,13 L792,26 L801,19 L814,28 L820,15 L827,20 L833,11 L849,17 L854,25 L861,20 L868,22 L875,12 L881,18 L895,14 L902,24 L912,17 L918,29 L923,15 L939,21 L946,10 L952,18 L960,13 L971,25 L977,19 L984,23 L991,11 L998,17 L1012,14 L1018,24 L1025,8 L1031,17 L1043,20 L1049,12 L1056,25 L1065,18 L1078,27 L1084,14 L1091,20 L1097,10 L1113,16 L1118,24 L1125,19 L1132,22 L1139,12 L1145,18 L1159,15 L1165,26 L1176,18 L1182,28 L1187,16 L1200,13 L1200,45 Z" fill="currentColor" />
+                </svg>
+            </div>
             <span class="section-divider-logo" role="img" aria-label="Butler's Pizza logo"></span>
             <h2 class="section-heading">LUNCH SPECIALS</h2>
 
@@ -107,6 +120,11 @@
                         <a class="menu-page-button" href="specials.html">SPECIALS</a>
                     </div>
                 </div>
+            </div>
+            <div class="torn-edge bottom-edge" aria-hidden="true">
+                <svg viewBox="0 0 1200 45" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0,0 L1200,0 L1200,16 L1187,21 L1181,13 L1175,24 L1161,18 L1156,27 L1150,19 L1144,22 L1131,11 L1125,19 L1119,9 L1105,22 L1099,15 L1093,26 L1080,18 L1074,28 L1068,16 L1054,21 L1048,10 L1042,19 L1028,13 L1017,24 L1011,17 L1005,27 L999,15 L985,19 L979,8 L973,18 L967,25 L953,16 L947,22 L941,12 L927,19 L921,28 L915,17 L901,22 L895,12 L889,20 L875,14 L869,26 L863,17 L849,29 L843,19 L837,11 L823,23 L817,16 L811,27 L797,13 L791,20 L785,9 L779,18 L765,25 L759,15 L753,22 L739,12 L733,20 L727,29 L721,17 L707,23 L701,13 L695,21 L681,11 L675,19 L669,26 L655,16 L649,22 L643,10 L629,19 L623,28 L617,17 L603,23 L597,12 L591,21 L577,15 L571,27 L565,18 L551,29 L545,19 L539,10 L525,22 L519,15 L513,26 L499,13 L493,20 L487,8 L481,18 L467,25 L461,14 L455,22 L441,11 L435,19 L429,29 L423,17 L409,23 L403,12 L397,21 L383,10 L377,18 L371,26 L357,15 L351,22 L345,9 L331,19 L325,28 L319,17 L305,23 L299,12 L293,20 L279,14 L273,27 L267,18 L253,29 L247,19 L241,10 L227,22 L221,15 L215,26 L201,13 L195,20 L189,8 L183,18 L169,25 L163,14 L157,22 L143,11 L137,19 L131,29 L125,17 L111,23 L105,12 L99,21 L85,10 L79,18 L73,27 L59,16 L53,22 L47,9 L33,19 L27,28 L21,17 L0,16 Z" fill="currentColor" />
+                </svg>
             </div>
         </section>
 
