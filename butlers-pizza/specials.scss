@@ -1,1 +1,74 @@
 @use "menu-items";
+
+
+.discount-section {
+    max-width: 1000px;
+    margin: 56px auto 0;
+    padding: 32px;
+    border-radius: 10px;
+    background-color: rgba(234, 222, 188, 0.72);
+}
+
+
+.discount-section > h2 {
+    margin-bottom: 24px;
+    color: var(--accent-red);
+    font-size: 36px;
+    font-weight: 900;
+    text-align: center;
+}
+
+
+.discount-section ul {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+
+.discount-section li {
+    display: flex;
+    min-height: 120px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px 14px;
+    border: 2px solid var(--text-dark);
+    border-radius: 8px;
+    background-color: var(--bg-menu-cream);
+    font-weight: 900;
+    text-align: center;
+}
+
+
+.discount-section li strong {
+    padding: 5px 14px;
+    border-radius: 20px;
+    background-color: var(--accent-red);
+    color: var(--bg-menu-cream);
+    font-size: 18px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+
+@media (max-width: 900px) {
+    .discount-section ul {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 600px) {
+    .discount-section {
+        padding: 24px 18px;
+    }
+
+    .discount-section ul {
+        grid-template-columns: 1fr;
+    }
+}
