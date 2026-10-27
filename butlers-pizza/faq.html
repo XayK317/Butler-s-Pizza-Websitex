@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ's | Butler's Pizza</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="faq.css">
 </head>
 <body>
     <div class="page-container">
@@ -97,6 +98,48 @@
                     <p>Yes. Our lunch specials run from 11:00 am–2:00 pm.</p>
                 </details>
             </div>
+            <section class="job-application" aria-labelledby="job-application-heading">
+                <h2 id="job-application-heading">Job Application</h2>
+                <p>Interested in joining our team? Fill out the form below and please review and submit your application.</p>
+                <form id="job-application-form" action="mailto:3dbutlerpizza@att.net" method="post" enctype="text/plain">
+                    <div class="job-application-fields">
+                        <div class="form-field">
+                            <label for="applicant-name">Name</label>
+                            <input id="applicant-name" name="Name" type="text" autocomplete="name" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="applicant-phone">Phone</label>
+                            <input id="applicant-phone" name="Phone" type="tel" autocomplete="tel" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="applicant-address">Address</label>
+                            <input id="applicant-address" name="Address" type="text" autocomplete="street-address" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="applicant-dob">Date of birth</label>
+                            <input id="applicant-dob" name="Date of birth" type="date" autocomplete="bday" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="applicant-email">Email</label>
+                            <input id="applicant-email" name="Email" type="email" autocomplete="email" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="applicant-position">Position requested</label>
+                            <select id="applicant-position" name="Position requested" required>
+                                <option value="" disabled selected>Select a position</option>
+                                <option value="Cashier">Cashier</option>
+                                <option value="Cook">Cook</option>
+                            </select>
+                        </div>
+                        <div class="form-field form-field-wide">
+                            <label for="applicant-employment">Previous employment</label>
+                            <textarea id="applicant-employment" name="Previous employment" rows="5" placeholder="List previous employers, roles, and dates (or enter N/A)." required></textarea>
+                        </div>
+                    </div>
+                    <p class="job-application-note">Your date of birth is included in the draft email. Only continue if you are comfortable sharing it by email.</p>
+                    <button class="job-application-submit" type="submit">Prepare application email</button>
+                </form>
+            </section>
         </main>
         <footer class="site-footer" id="visit">
             <div class="footer-content-wrapper">

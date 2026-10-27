@@ -1,0 +1,160 @@
+@use "info-components";
+
+
+.faq-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 36px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+
+.faq-list details {
+    padding: 20px 0;
+    border-bottom: 2px dashed rgba(30, 30, 30, 0.2);
+}
+
+
+.faq-list summary {
+    color: var(--accent-red);
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+
+.faq-list details p {
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+
+.faq-list details p a {
+    color: var(--accent-red);
+    font-weight: bold;
+}
+
+.job-application {
+    max-width: 900px;
+    margin: 56px auto 0;
+    padding-top: 36px;
+    border-top: 2px solid rgba(30, 30, 30, 0.2);
+    text-align: left;
+}
+
+.job-application > h2 {
+    margin-bottom: 12px;
+    color: var(--accent-red);
+    font-size: 30px;
+    font-weight: 900;
+    text-align: center;
+}
+
+.job-application > p {
+    margin-bottom: 24px;
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.job-application > p a {
+    color: var(--accent-red);
+    font-weight: bold;
+}
+
+.job-application-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-field-wide {
+    grid-column: 1 / -1;
+}
+
+.form-field label {
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid #827a68;
+    border-radius: 4px;
+    background-color: #fffdf6;
+    color: var(--text-dark);
+    font: inherit;
+}
+
+.form-field textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-field input:focus-visible,
+.form-field select:focus-visible,
+.form-field textarea:focus-visible {
+    outline: 3px solid var(--accent-red);
+    outline-offset: 2px;
+}
+
+.job-application-note {
+    margin: 18px 0 !important;
+    font-size: 13px !important;
+    text-align: left !important;
+}
+
+.job-application-submit {
+    padding: 12px 22px;
+    border: 2px solid #000;
+    border-radius: 20px;
+    background-color: var(--accent-red);
+    color: var(--bg-menu-cream);
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.job-application-submit:hover,
+.job-application-submit:focus-visible {
+    background-color: #a92710;
+}
+
+.job-application-submit:focus-visible {
+    outline: 3px solid var(--text-dark);
+    outline-offset: 3px;
+}
+
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px) {
+
+
+    .faq-list {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+    .job-application-fields {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .form-field-wide {
+        grid-column: auto;
+    }
+}

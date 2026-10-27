@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "build:css": "sass --no-source-map --style=expanded butlers-pizza"
+  },
+  "devDependencies": {
+    "sass": "^1.106.1"
+  }
+}

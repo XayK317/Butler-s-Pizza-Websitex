@@ -1,0 +1,336 @@
+
+
+/* ABOUT / MEDIA PAGE */
+.about-page main {
+    text-align: center;
+}
+
+
+.about-intro {
+    position: sticky;
+    top: var(--sticky-header-height);
+    z-index: 3;
+    min-height: 45vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 70px 10%;
+    background-color: var(--bg-hero-yellow);
+    background-image:
+        linear-gradient(rgba(244, 171, 46, 0.84), rgba(244, 171, 46, 0.84)),
+        url("assets/butlers-brick-wall.jpg");
+    background-position: center;
+    background-size: cover, auto 108%;
+}
+
+
+.about-intro h1,
+.media-section h2 {
+    margin-bottom: 20px;
+    font-size: clamp(38px, 6vw, 64px);
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+
+.about-intro p {
+    max-width: 720px;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+
+.about-team-photo {
+    display: block;
+    width: min(100%, 486px);
+    height: auto;
+    margin-top: 24px;
+    border: 5px solid var(--text-dark);
+    border-radius: 10px;
+    box-shadow:
+        0 0 0 3px var(--accent-red),
+        0 10px 24px rgba(30, 30, 30, 0.28);
+}
+
+
+.media-section {
+    position: relative;
+    z-index: 4;
+    padding: 60px 40px 80px;
+    background-color: var(--bg-menu-cream);
+}
+
+
+.media-section h2 {
+    text-align: center;
+}
+
+
+.media-section > p {
+    max-width: 960px;
+    margin: 0 auto 28px;
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+
+.media-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+.media-gallery img {
+    display: block;
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+}
+
+
+.media-gallery-collage {
+    position: relative;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: clamp(90px, 12vw, 150px);
+    gap: 6px;
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: var(--bg-menu-cream);
+}
+
+
+.media-gallery-item {
+    min-width: 0;
+    min-height: 0;
+    transition: transform 280ms ease, box-shadow 280ms ease;
+}
+
+
+.media-gallery-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: object-fit 280ms ease;
+}
+
+
+.media-gallery-collage:hover .media-gallery-item:not(:hover),
+.media-gallery-collage:focus-within .media-gallery-item:not(:focus-within) {
+    transform: scale(0.82);
+}
+
+
+.media-gallery-item:hover,
+.media-gallery-item:focus-within {
+    z-index: 5;
+    transform: scale(1.4);
+    box-shadow: 0 8px 20px rgba(30, 30, 30, 0.35);
+}
+
+
+.media-gallery-item:hover img,
+.media-gallery-item:focus-within img {
+    object-fit: cover;
+    background-color: transparent;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .media-gallery-item,
+    .media-gallery-item img {
+        transition: none;
+    }
+
+}
+
+
+.media-gallery-collage > .media-gallery-item:nth-child(1) {
+    grid-area: 1 / 1 / span 2 / span 2;
+}
+
+
+.media-gallery-collage > .media-gallery-item:nth-child(2) {
+    grid-area: 1 / 3 / span 2 / span 1;
+}
+
+
+.media-gallery-collage > .media-gallery-item:nth-child(3) {
+    grid-area: 1 / 4;
+}
+
+
+.media-gallery-collage > .media-gallery-item:nth-child(4) {
+    grid-area: 2 / 4;
+}
+
+
+.media-gallery-collage > .media-gallery-item:nth-child(5) {
+    grid-area: 3 / 3;
+}
+
+
+.media-gallery-collage > .media-gallery-item:nth-child(6) {
+    grid-area: 3 / 4;
+}
+
+
+.media-gallery-collage > .media-gallery-item:nth-child(7) {
+    grid-area: 3 / 1 / span 1 / span 2;
+}
+
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px) {
+
+
+    .media-gallery {
+        grid-template-columns: 1fr;
+    }
+
+
+    .media-gallery img {
+        height: 320px;
+    }
+
+
+    .media-gallery-collage {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: clamp(130px, 22vw, 200px);
+    }
+
+
+    .media-gallery-collage > .media-gallery-item {
+        height: 100%;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(1),
+    .media-gallery-collage > .media-gallery-item:nth-child(7) {
+        grid-column: span 2;
+        grid-row: span 1;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(2) {
+        grid-row: span 1;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(1) {
+        grid-area: 1 / 1 / span 1 / span 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(2) {
+        grid-area: 2 / 1 / span 2 / span 1;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(3) {
+        grid-area: 2 / 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(4) {
+        grid-area: 3 / 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(5) {
+        grid-area: 4 / 1;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(6) {
+        grid-area: 4 / 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(7) {
+        grid-area: 5 / 1 / span 1 / span 2;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+
+    .about-intro,
+    .media-section {
+        padding: 40px 24px;
+    }
+
+
+    .about-intro p {
+        font-size: 16px;
+    }
+
+
+    .media-gallery img {
+        height: 240px;
+    }
+
+
+    .media-gallery-collage {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: clamp(110px, 30vw, 150px);
+    }
+
+
+    .media-gallery-collage > .media-gallery-item {
+        height: 100%;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(1),
+    .media-gallery-collage > .media-gallery-item:nth-child(7) {
+        grid-column: span 2;
+        grid-row: span 1;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(2) {
+        grid-row: span 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(1) {
+        grid-area: 1 / 1 / span 1 / span 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(2) {
+        grid-area: 2 / 1 / span 2 / span 1;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(3) {
+        grid-area: 2 / 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(4) {
+        grid-area: 3 / 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(5) {
+        grid-area: 4 / 1;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(6) {
+        grid-area: 4 / 2;
+    }
+
+
+    .media-gallery-collage > .media-gallery-item:nth-child(7) {
+        grid-area: 5 / 1 / span 1 / span 2;
+    }
+
+}
