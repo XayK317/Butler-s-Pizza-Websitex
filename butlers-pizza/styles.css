@@ -64,6 +64,7 @@ h6,
   line-height: 0.9;
   font-weight: 900;
   font-family: var(--font-main);
+  text-decoration: none;
 }
 
 .logo-top {
