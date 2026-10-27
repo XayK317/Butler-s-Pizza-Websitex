@@ -1,4 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".map-placeholder").forEach((mapContainer) => {
+        const map = mapContainer.querySelector(".map-embed");
+        if (!map) {
+            return;
+        }
+
+        mapContainer.querySelectorAll("[data-map-zoom]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const mapUrl = new URL(map.src);
+                const currentZoom = Number(mapUrl.searchParams.get("z")) || 15;
+                const zoomChange = button.dataset.mapZoom === "in" ? 1 : -1;
+                const nextZoom = Math.max(10, Math.min(20, currentZoom + zoomChange));
+
+                if (nextZoom !== currentZoom) {
+                    mapUrl.searchParams.set("z", String(nextZoom));
+                    map.src = mapUrl.toString();
+                }
+            });
+        });
+    });
+
     const footerStage = document.querySelector(".footer-reveal-stage");
     const footer = footerStage?.querySelector(".site-footer");
     const menu = document.querySelector("#menu");

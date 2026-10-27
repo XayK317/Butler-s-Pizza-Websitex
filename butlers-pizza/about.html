@@ -6,7 +6,7 @@
     <title>About &amp; Media | Butler's Pizza</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="about-page">
     <div class="page-container">
         <header class="site-header">
             <a class="brand-logo" href="index.html" aria-label="Butler's Pizza home">
@@ -14,10 +14,11 @@
                 <span class="logo-bottom">PIZZA</span>
             </a>
             <nav class="nav-links" aria-label="Main navigation">
-                <a href="index.html#menu">MENU</a>
-                <a href="#about" aria-current="page">ABOUT / MEDIA</a>
-                <a href="index.html#catering">CATERING</a>
-                <a href="index.html#visit">FAQ</a>
+                <a href="menu.html">MENU</a>
+                <a href="specials.html">SPECIALS</a>
+                <a href="about.html" aria-current="page">ABOUT / MEDIA</a>
+                <a href="catering.html">CATERING</a>
+                <a href="faq.html">FAQ's</a>
             </nav>
             <a href="index.html#order" class="order-btn">ORDER</a>
         </header>
@@ -25,15 +26,26 @@
         <main>
             <section class="about-intro" id="about">
                 <h1>ABOUT BUTLER'S</h1>
-                <p>Good food, generous portions, and the kind of neighborhood hospitality that keeps you coming back. Take a look at what we're making at Butler's Pizza.</p>
+                <p> My father started Butler's Pizza in 1990 as a family-run pizza restaurant, and we have proudly served the Indianapolis pizza community ever since. Over the years, we grew and opened three branches on the westside of Indianapolis. Today, we continue to honor his legacy by serving delicious pizza made with love and care, and customers can easily order pizza online to enjoy our specialties.</p>
+                <img class="about-team-photo" src="assets/about-team.png" alt="The Butler's Pizza team together in the restaurant kitchen">
             </section>
 
             <section class="media-section" id="media" aria-labelledby="media-heading">
+                <div class="torn-edge top-edge" aria-hidden="true">
+                    <svg viewBox="0 0 1200 45" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0,45 L0,20 L13,17 L19,25 L25,14 L39,20 L44,12 L49,18 L66,16 L73,27 L79,19 L84,22 L91,10 L98,17 L113,14 L119,24 L130,18 L135,28 L141,16 L157,20 L164,11 L169,18 L177,13 L188,23 L194,19 L201,25 L207,12 L214,18 L229,15 L234,21 L242,9 L248,17 L260,20 L266,14 L272,24 L281,18 L294,27 L300,13 L307,19 L314,11 L329,16 L335,25 L341,20 L347,22 L354,10 L361,17 L374,14 L380,23 L390,18 L396,28 L401,15 L417,21 L425,12 L430,19 L438,11 L448,23 L455,17 L461,25 L468,13 L475,18 L489,14 L495,22 L502,8 L508,17 L521,20 L527,13 L533,25 L542,19 L551,28 L557,14 L564,19 L570,10 L586,16 L591,24 L598,20 L605,22 L612,12 L618,18 L633,15 L639,26 L650,19 L656,29 L661,16 L676,21 L683,11 L689,18 L697,14 L707,25 L714,19 L720,24 L728,12 L735,17 L748,14 L754,23 L761,9 L767,18 L779,21 L785,13 L792,26 L801,19 L814,28 L820,15 L827,20 L833,11 L849,17 L854,25 L861,20 L868,22 L875,12 L881,18 L895,14 L902,24 L912,17 L918,29 L923,15 L939,21 L946,10 L952,18 L960,13 L971,25 L977,19 L984,23 L991,11 L998,17 L1012,14 L1018,24 L1025,8 L1031,17 L1043,20 L1049,12 L1056,25 L1065,18 L1078,27 L1084,14 L1091,20 L1097,10 L1113,16 L1118,24 L1125,19 L1132,22 L1139,12 L1145,18 L1159,15 L1165,26 L1176,18 L1182,28 L1187,16 L1200,13 L1200,45 Z" fill="currentColor" />
+                    </svg>
+                </div>
                 <h2 id="media-heading">FROM OUR KITCHEN</h2>
-                <div class="media-gallery">
-                    <img src="assets/media-pizza.webp" alt="Freshly baked cheese pizza">
-                    <img src="assets/media-sandwich.png" alt="Butler's sandwich with melted cheese and vegetables">
-                    <img src="assets/media-pizza-trays.png" alt="Two baked pizzas in serving trays">
+                <p>At our pizza restaurant, we offer a wide range of Indianapolis pizza, breadsticks, and sandwiches. All our ingredients are carefully selected to ensure the highest quality and authenticity, making it easy for you to order pizza online with confidence. Our talented cooks, Amanda, Paula, and Cantrell, are master pizza and sandwich makers at our Indianapolis pizza restaurant, boasting over 20 years of experience. Their passion for food and commitment to using only the freshest ingredients shine through in every pizza and sandwich they create. They are always eager to share their knowledge and expertise with customers looking to order pizza online.</p>
+                <div class="media-gallery media-gallery-collage">
+                    <div class="media-gallery-item"><img src="assets/media-pizza.webp" alt="Freshly baked cheese pizza"></div>
+                    <div class="media-gallery-item"><img src="assets/media-sandwich.png" alt="Butler's sandwich with melted cheese and vegetables"></div>
+                    <div class="media-gallery-item"><img src="assets/media-pizza-trays.png" alt="Two baked pizzas in serving trays"></div>
+                    <div class="media-gallery-item"><img src="assets/media-catering-trays.jpg" alt="Pizza and breadsticks in catering trays"></div>
+                    <div class="media-gallery-item"><img src="assets/media-sandwich-closeup.jpg" alt="Fresh sandwich with ham, tomato, and spinach"></div>
+                    <div class="media-gallery-item"><img src="assets/media-pizza-breadsticks.jpg" alt="Personal pizza served with breadsticks and dipping sauces"></div>
+                    <div class="media-gallery-item"><img src="assets/media-stuffed-breadsticks.jpg" alt="Stuffed breadsticks and pizza ready to serve"></div>
                 </div>
             </section>
         </main>
@@ -43,14 +55,36 @@
                 <div class="footer-info">
                     <h2 class="footer-section-title">VISIT US</h2>
                     <div class="footer-block">
+                        <h4>SPECIAL REQUESTS</h4>
+                        <p>DO YOU HAVE DIETARY CONCERNS ABOUT OUR INDIANAPOLIS PIZZA? HAVE QUESTIONS REGARDING AN UPCOMING EVENT AT OUR PIZZA RESTAURANT? DROP US A LINE, AND WE'LL GET BACK TO YOU SOON. YOU CAN ALSO ORDER PIZZA ONLINE FOR YOUR CONVENIENCE.</p>
+                    </div>
+                    <div class="footer-block">
                         <h4>BUTLER'S PIZZA</h4>
                         <p>1222 WATERWAY BOULEVARD, INDIANAPOLIS, INDIANA 46202, UNITED STATES</p>
                         <p class="phone-number">317-500-5463 OR 317-600-8793</p>
                     </div>
+                    <div class="footer-block">
+                        <h4>HOURS</h4>
+                        <p>Mon–Sun: 11:00 am–8:00 pm<br>Holiday hours may vary</p>
+                    </div>
                 </div>
                 <div class="footer-interactive">
                     <div class="map-placeholder">
-                        <span>[Insert Map Image / Embed Here]</span>
+                        <iframe
+                            class="map-embed"
+                            title="Map to Butler's Pizza"
+                            src="https://maps.google.com/maps?q=1222+Waterway+Boulevard%2C+Indianapolis%2C+Indiana+46202&amp;z=15&amp;output=embed"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            allowfullscreen>
+                        </iframe>
+                        <div class="map-controls">
+                            <a class="map-directions" href="https://www.google.com/maps/dir/?api=1&amp;destination=1222+Waterway+Boulevard%2C+Indianapolis%2C+Indiana+46202" target="_blank" rel="noopener noreferrer">GET DIRECTIONS</a>
+                            <div class="map-zoom-controls" aria-label="Map zoom controls">
+                                <button type="button" data-map-zoom="in" aria-label="Zoom in on map">+</button>
+                                <button type="button" data-map-zoom="out" aria-label="Zoom out on map">−</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="social-links">
                         <a href="#" aria-label="Twitter" class="social-icon">🐦</a>
@@ -62,5 +96,6 @@
             </div>
         </footer>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>
