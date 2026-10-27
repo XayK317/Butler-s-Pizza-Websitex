@@ -59,6 +59,8 @@
     z-index: 4;
     padding: 60px 40px 80px;
     background-color: var(--bg-menu-cream);
+    background-image: var(--checkerboard);
+    background-size: var(--checkerboard-size);
 }
 
 
@@ -98,6 +100,8 @@
     max-width: 900px;
     margin: 0 auto;
     background-color: var(--bg-menu-cream);
+    background-image: var(--checkerboard);
+    background-size: var(--checkerboard-size);
 }
 
 

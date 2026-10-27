@@ -61,7 +61,6 @@
   margin: 56px auto 0;
   padding: 32px;
   border-radius: 10px;
-  background-color: rgba(234, 222, 188, 0.72);
 }
 
 .discount-section > h2 {
@@ -90,6 +89,8 @@
   border: 2px solid var(--text-dark);
   border-radius: 8px;
   background-color: var(--bg-menu-cream);
+  background-image: var(--checkerboard);
+  background-size: var(--checkerboard-size);
   font-weight: 900;
   text-align: center;
 }

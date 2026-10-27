@@ -10,6 +10,13 @@
     --accent-red: #d13014;
     --font-main: Arial, sans-serif;
     --sticky-header-height: 76px;
+    --checkerboard: conic-gradient(
+        rgb(30 30 30 / 4.5%) 25%,
+        transparent 0 50%,
+        rgb(30 30 30 / 4.5%) 0 75%,
+        transparent 0
+    );
+    --checkerboard-size: 64px 64px;
 }
 
 
@@ -155,6 +162,9 @@ h6,
     position: relative;
     z-index: 4;
     background-color: var(--bg-menu-cream);
+    background-image: var(--checkerboard);
+    background-position: 0 2px;
+    background-size: var(--checkerboard-size);
     padding: 60px 40px;
 }
 
@@ -174,6 +184,11 @@ h6,
 .torn-edge svg {
     width: 100%;
     height: 100%;
+}
+
+
+.torn-edge path {
+    fill: url(#torn-checkerboard);
 }
 
 
