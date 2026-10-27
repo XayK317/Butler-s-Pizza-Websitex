@@ -72,6 +72,7 @@ h6,
     flex-direction: column;
     line-height: 0.9;
     font-weight: 900;
+    font-family: var(--font-main);
 }
 
 
@@ -256,6 +257,12 @@ h6,
     align-items: center;
 }
 
+.footer-info {
+    padding: 24px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.25);
+}
+
 
 .footer-section-title {
     font-size: 48px;
@@ -272,6 +279,7 @@ h6,
 
 
 .footer-block h4 {
+    font-family: var(--font-main);
     font-size: 14px;
     font-weight: 900;
     margin-bottom: 8px;
@@ -280,7 +288,8 @@ h6,
 
 
 .footer-block p {
-    font-size: 11px;
+    font-family: var(--font-main);
+    font-size: 13px;
     line-height: 1.5;
     color: #bbb;
 }
