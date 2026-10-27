@@ -329,7 +329,8 @@ h6,
 }
 
 
-.map-directions {
+.map-directions,
+.amp-link {
     display: inline-flex;
     min-height: 40px;
     align-items: center;
@@ -368,7 +369,9 @@ h6,
 
 
 .map-directions:hover,
-.map-directions:focus-visible {
+.amp-link:hover,
+.map-directions:focus-visible,
+.amp-link:focus-visible {
     background-color: #f4efdb;
     color: var(--text-dark);
 }
@@ -416,28 +419,52 @@ h6,
     gap: 15px;
 }
 
-
 .social-icon {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 38px;
     height: 38px;
-    background-color: #2eac43;
     color: #fff;
     border-radius: 50%;
     text-decoration: none;
-    font-size: 16px;
+    transition: transform 0.2s ease;
 }
 
+.social-icon:hover {
+    transform: translateY(-2px);
+}
 
-.social-icon:nth-child(1) { background-color: #1da1f2; }
+.social-icon svg {
+    width: 21px;
+    height: 21px;
+    fill: currentColor;
+}
 
-.social-icon:nth-child(2) { background-color: #1877f2; }
+.social-tiktok {
+    background-color: #111;
+}
 
-.social-icon:nth-child(3) { background-color: #e1306c; }
+.social-facebook {
+    background-color: #0866ff;
+}
 
-.social-icon:nth-child(4) { background-color: #25d366; }
+.social-instagram {
+    background: linear-gradient(45deg, #feda75, #fa7e1e 35%, #d62976 65%, #4f5bd5);
+}
+
+.social-yelp {
+    background-color: #d32323;
+}
+
+.amp-link:focus-visible {
+    outline: 3px solid var(--accent-red);
+    outline-offset: 3px;
+}
+
+.amp-link {
+    text-transform: uppercase;
+}
 
 
 /* RESPONSIVE DESIGN */
