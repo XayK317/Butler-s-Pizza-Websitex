@@ -52,8 +52,6 @@
 
 .job-application > h2 {
   margin-bottom: 12px;
-  color: var(--accent-red);
-  font-size: 30px;
   font-weight: 900;
   text-align: center;
 }

@@ -12,8 +12,6 @@
 
 .discount-section > h2 {
     margin-bottom: 24px;
-    color: var(--accent-red);
-    font-size: 36px;
     font-weight: 900;
     text-align: center;
 }
@@ -56,10 +54,39 @@
 }
 
 
+.coupon-section {
+    max-width: 1000px;
+    margin: 48px auto 0;
+}
+
+
+.coupon-section > .section-heading {
+    width: 100%;
+}
+
+
+.coupon-terms,
+.coupon-section > .coupon-expiration {
+    max-width: 760px;
+    margin: -12px auto 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+
+.coupon-section > .coupon-expiration {
+    margin: 0 auto 30px;
+    color: var(--accent-red);
+    font-weight: 900;
+}
+
+
 @media (max-width: 900px) {
     .discount-section ul {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
 }
 
 
@@ -71,4 +98,5 @@
     .discount-section ul {
         grid-template-columns: 1fr;
     }
+
 }
