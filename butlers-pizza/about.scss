@@ -10,18 +10,21 @@
     position: sticky;
     top: var(--sticky-header-height);
     z-index: 3;
-    min-height: 45vh;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-rows: auto auto;
     align-items: center;
-    justify-content: center;
-    padding: 70px 10%;
+    column-gap: 48px;
+    row-gap: 18px;
+    height: 560px;
+    padding: 40px 6%;
     background-color: var(--bg-hero-yellow);
     background-image:
         linear-gradient(rgba(244, 171, 46, 0.84), rgba(244, 171, 46, 0.84)),
         url("assets/butlers-brick-wall.jpg");
     background-position: center;
-    background-size: cover, auto 108%;
+    background-repeat: no-repeat;
+    background-size: cover, cover;
 }
 
 
@@ -35,17 +38,28 @@
 
 
 .about-intro p {
-    max-width: 720px;
+    max-width: 500px;
     font-size: 18px;
     line-height: 1.6;
 }
 
 
+.about-intro h1,
+.about-intro p {
+    grid-column: 1;
+    text-align: left;
+}
+
+
 .about-team-photo {
     display: block;
-    width: min(100%, 486px);
-    height: auto;
-    margin-top: 24px;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 100%;
+    height: 100%;
+    max-height: 440px;
+    margin: 0;
+    object-fit: cover;
     border: 5px solid var(--text-dark);
     border-radius: 10px;
     box-shadow:
@@ -190,6 +204,33 @@
 /* RESPONSIVE DESIGN */
 @media (max-width: 900px) {
 
+    .about-intro {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto;
+        justify-items: center;
+        row-gap: 18px;
+        height: auto;
+        min-height: 560px;
+        padding: 48px 40px;
+    }
+
+
+    .about-intro h1,
+    .about-intro p {
+        grid-column: 1;
+        text-align: center;
+    }
+
+
+    .about-team-photo {
+        grid-column: 1;
+        grid-row: auto;
+        width: min(100%, 620px);
+        height: auto;
+        max-height: 300px;
+        margin: 0;
+    }
+
 
     .media-gallery {
         grid-template-columns: 1fr;
@@ -267,6 +308,10 @@
     .about-intro,
     .media-section {
         padding: 40px 24px;
+    }
+
+    .about-intro {
+        min-height: 560px;
     }
 
 
