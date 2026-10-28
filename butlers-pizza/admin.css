@@ -191,6 +191,7 @@ textarea {
 .content-editor {
     display: flex;
     min-height: 0;
+    min-width: 0;
     flex-direction: column;
     overflow-y: auto;
     background: #f3ead1;
@@ -335,7 +336,7 @@ textarea {
     }
 
     .editor-workspace {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         height: auto;
         min-height: 0;
         overflow: visible;
