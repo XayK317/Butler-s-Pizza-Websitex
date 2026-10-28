@@ -1,23 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const jobApplicationForm = document.querySelector("#job-application-form");
-    if (jobApplicationForm instanceof HTMLFormElement) {
-        jobApplicationForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            const formData = new FormData(jobApplicationForm);
-            const body = [
-                `Name: ${formData.get("Name")}`,
-                `Phone: ${formData.get("Phone")}`,
-                `Address: ${formData.get("Address")}`,
-                `Date of birth: ${formData.get("Date of birth")}`,
-                `Email: ${formData.get("Email")}`,
-                `Position requested: ${formData.get("Position requested")}`,
-                `Previous employment:\n${formData.get("Previous employment")}`
-            ].join("\n\n");
-            const subject = `Job Application - ${formData.get("Name")}`;
-            window.location.href = `mailto:3dbutlerpizza@att.net?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        });
-    }
-
     document.querySelectorAll(".map-placeholder").forEach((mapContainer) => {
         const map = mapContainer.querySelector(".map-embed");
         if (!map) {

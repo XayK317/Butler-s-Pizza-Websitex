@@ -28,7 +28,41 @@
         <main class="menu-section menu-page-content info-page">
             <h1 class="section-heading">CATERING</h1>
             <p>Planning a gathering? Contact Butler's Pizza to talk through your catering and bulk order request and food options. We deliver on orders $100 and above. We will set up the food for cater, but you will be required to serve.</p>
-            <p>Call us at <a href="tel:+13175005463">317-500-5463</a> or <a href="tel:+13176008793">317-600-8793</a>.</p>
+            <p>Call us at <a href="tel:+13175005463">317-500-5463</a> or <a href="tel:+13176008793">317-600-8793</a>, or send us an email using the form below.</p>
+            <section class="catering-inquiry" aria-labelledby="catering-inquiry-heading">
+                <h2 id="catering-inquiry-heading" class="section-heading">CATERING INQUIRY</h2>
+                <form id="catering-inquiry-form" class="catering-form" action="https://formsubmit.co/3dbutlerpizza@att.net" method="POST">
+                    <input type="hidden" name="_subject" value="New Catering Inquiry">
+                    <input type="hidden" name="_template" value="table">
+                    <div class="catering-form-fields">
+                        <div class="catering-form-field">
+                        <label for="catering-name">Name</label>
+                        <input id="catering-name" name="Name" type="text" autocomplete="name" required>
+                        </div>
+                        <div class="catering-form-field">
+                        <label for="catering-email">Email</label>
+                        <input id="catering-email" name="email" type="email" autocomplete="email" required>
+                        </div>
+                        <div class="catering-form-field">
+                            <label for="catering-event">Event</label>
+                            <input id="catering-event" name="Event" type="text" required>
+                        </div>
+                        <div class="catering-form-field">
+                            <label for="catering-date">Event date</label>
+                            <input id="catering-date" name="Event date" type="date" required>
+                        </div>
+                        <div class="catering-form-field">
+                            <label for="catering-time">Event time</label>
+                            <input id="catering-time" name="Event time" type="time" required>
+                        </div>
+                        <div class="catering-form-field catering-form-field-wide">
+                            <label for="catering-request">What would you like to request or ask?</label>
+                            <textarea id="catering-request" name="Request or question" rows="5" required></textarea>
+                        </div>
+                    </div>
+                    <button class="catering-form-submit" type="submit">Send catering inquiry</button>
+                </form>
+            </section>
         </main>
         <footer class="site-footer" id="visit">
             <div class="footer-content-wrapper">

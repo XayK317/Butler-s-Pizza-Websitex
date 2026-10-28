@@ -106,7 +106,9 @@
             <section class="job-application" aria-labelledby="job-application-heading">
                 <h2 id="job-application-heading" class="section-heading">JOB APPLICATION</h2>
                 <p>Interested in joining our team? Fill out the form below and please review and submit your application.</p>
-                <form id="job-application-form" action="mailto:3dbutlerpizza@att.net" method="post" enctype="text/plain">
+                <form id="job-application-form" action="https://formsubmit.co/3dbutlerpizza@att.net" method="POST">
+                    <input type="hidden" name="_subject" value="New Job Application">
+                    <input type="hidden" name="_template" value="table">
                     <div class="job-application-fields">
                         <div class="form-field">
                             <label for="applicant-name">Name</label>
@@ -126,7 +128,7 @@
                         </div>
                         <div class="form-field">
                             <label for="applicant-email">Email</label>
-                            <input id="applicant-email" name="Email" type="email" autocomplete="email" required>
+                            <input id="applicant-email" name="email" type="email" autocomplete="email" required>
                         </div>
                         <div class="form-field">
                             <label for="applicant-position">Position requested</label>
@@ -141,8 +143,8 @@
                             <textarea id="applicant-employment" name="Previous employment" rows="5" placeholder="List previous employers, roles, and dates (or enter N/A)." required></textarea>
                         </div>
                     </div>
-                    <p class="job-application-note">Your date of birth is included in the draft email. Only continue if you are comfortable sharing it by email.</p>
-                    <button class="job-application-submit" type="submit">Prepare application email</button>
+                    <p class="job-application-note">Your date of birth will be included with your application. Only continue if you are comfortable sharing it electronically.</p>
+                    <button class="job-application-submit" type="submit">Submit application</button>
                 </form>
             </section>
         </main>
