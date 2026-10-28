@@ -123,17 +123,27 @@
                         <p class="selection-message" id="selection-message" role="status"></p>
                     </section>
 
-                    <details class="list-manager">
-                        <summary>Manage menu items and specials</summary>
-                        <form id="content-form">
-                            <div class="content-fields" id="content-fields">
-                                <p>Select a page to load its item lists.</p>
-                            </div>
-                            <div class="save-bar">
-                                <p id="save-message" role="status" aria-live="polite"></p>
-                                <button type="submit">Save lists</button>
-                            </div>
-                        </form>
+                    <details class="list-manager account-manager" id="account-manager">
+                        <summary>Admin account</summary>
+                        <p id="account-email-display"></p>
+                        <button class="secondary-button" id="account-change-start" type="button">Recreate admin login</button>
+                        <div id="account-change-flow" hidden>
+                            <p>Confirm the current admin email before changing the login. This demo displays a confirmation link here instead of emailing it.</p>
+                            <button id="account-confirmation-button" type="button">Send confirmation to current email</button>
+                            <p class="form-message" id="account-change-message" role="status" hidden></p>
+                            <form id="account-change-form" hidden>
+                                <label>New admin email
+                                    <input id="account-change-email" name="email" type="email" autocomplete="email" required>
+                                </label>
+                                <label>New password
+                                    <input name="password" type="password" autocomplete="new-password" minlength="12" required>
+                                </label>
+                                <label>Confirm new password
+                                    <input name="confirm-password" type="password" autocomplete="new-password" minlength="12" required>
+                                </label>
+                                <button type="submit">Save new admin login</button>
+                            </form>
+                        </div>
                     </details>
                 </aside>
                 <iframe class="page-preview" id="page-preview" title="Selected website page preview"></iframe>

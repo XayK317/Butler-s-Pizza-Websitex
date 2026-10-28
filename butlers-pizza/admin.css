@@ -141,8 +141,7 @@ textarea {
 }
 
 .editor-header,
-.page-picker,
-.save-bar {
+.page-picker {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -244,78 +243,15 @@ textarea {
     cursor: pointer;
 }
 
-.list-manager form {
-    display: flex;
-    min-height: 300px;
-    flex-direction: column;
-}
-
-.content-fields {
-    padding: 14px;
-}
-
-.content-fields > p {
+.account-manager > p,
+.account-manager #account-change-flow {
+    margin: 0;
+    padding: 0 16px 16px;
     line-height: 1.5;
 }
 
-.content-fields details {
-    margin: 0 0 12px;
-    border: 1px solid #c8bea5;
-    border-radius: 6px;
-    background: #fffaf0;
-}
-
-.content-fields summary {
-    padding: 12px;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.field-body {
-    padding: 0 12px 12px;
-}
-
-.field-body label {
-    margin: 12px 0;
-}
-
-.field-body input,
-.field-body textarea {
-    border-color: #aaa18e;
-}
-
-.menu-record {
-    margin: 12px 0;
-    padding: 10px;
-    border: 1px solid #d4cbb7;
-    border-radius: 6px;
-}
-
-.menu-record legend {
-    font-weight: 800;
-}
-
-.remove-record {
-    min-height: 34px;
-    padding: 6px 12px;
-    background: #504b44;
-}
-
-.add-record {
-    margin: 8px 0 14px;
-}
-
-.save-bar {
-    position: sticky;
-    bottom: 0;
-    padding: 12px;
-    background: #292725;
-    color: white;
-}
-
-.save-bar p {
-    margin: 0;
-    font-size: 13px;
+.account-manager #account-change-form {
+    display: block;
 }
 
 .page-preview {

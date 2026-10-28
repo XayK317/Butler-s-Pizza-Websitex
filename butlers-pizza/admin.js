@@ -1,15 +1,8 @@
 (() => {
     const accountKey = "butlersPizzaLocalDemoAccountV1";
     const sessionKey = "butlersPizzaLocalDemoSessionV1";
+    const accountChangeSessionKey = "butlersPizzaLocalDemoAccountChangeUntilV1";
     const iterationCount = 210000;
-    const pageNames = {
-        "index.html": "Home",
-        "about.html": "About / Media",
-        "menu.html": "Menu",
-        "specials.html": "Lunch Specials",
-        "catering.html": "Catering",
-        "faq.html": "FAQ's"
-    };
 
     const authPanel = document.querySelector("#auth-panel");
     const setupForm = document.querySelector("#setup-form");
@@ -19,11 +12,15 @@
     const loginMessage = document.querySelector("#login-message");
     const adminPrompt = document.querySelector("#admin-prompt");
     const resetMessage = document.querySelector("#reset-message");
+    const accountManager = document.querySelector("#account-manager");
+    const accountEmailDisplay = document.querySelector("#account-email-display");
+    const accountChangeStart = document.querySelector("#account-change-start");
+    const accountChangeFlow = document.querySelector("#account-change-flow");
+    const accountConfirmationButton = document.querySelector("#account-confirmation-button");
+    const accountChangeMessage = document.querySelector("#account-change-message");
+    const accountChangeForm = document.querySelector("#account-change-form");
     const preview = document.querySelector("#page-preview");
-    const contentForm = document.querySelector("#content-form");
-    const contentFields = document.querySelector("#content-fields");
     const pageSelect = document.querySelector("#page-select");
-    const saveMessage = document.querySelector("#save-message");
     const selectionTitle = document.querySelector("#selection-title");
     const selectionHint = document.querySelector("#selection-hint");
     const selectionMessage = document.querySelector("#selection-message");
@@ -84,6 +81,30 @@
         return storedAccount ? JSON.parse(storedAccount) : null;
     };
 
+    const hasAccountChangeAuthorization = () => {
+        const authorizedUntil = Number(sessionStorage.getItem(accountChangeSessionKey));
+        return authorizedUntil > Date.now();
+    };
+
+    const renderAccountSettings = () => {
+        const account = readAccount();
+        accountEmailDisplay.textContent = account
+            ? `Current admin email: ${account.email}`
+            : "No local admin account was found.";
+        const authorized = hasAccountChangeAuthorization();
+        if (authorized) {
+            accountChangeFlow.dataset.open = "true";
+        }
+        const flowOpen = accountChangeFlow.dataset.open === "true" || authorized;
+        accountChangeFlow.hidden = !flowOpen;
+        accountManager.open = accountManager.open || authorized;
+        accountConfirmationButton.hidden = authorized;
+        accountChangeForm.hidden = !authorized;
+        if (authorized) {
+            accountChangeForm.elements.email.value = account?.email || "";
+        }
+    };
+
     const showLogin = () => {
         authPanel.hidden = false;
         setupForm.hidden = true;
@@ -95,7 +116,57 @@
     const showEditor = () => {
         authPanel.hidden = true;
         editorShell.hidden = false;
+        renderAccountSettings();
         loadSelectedPage();
+    };
+
+    const consumeAccountChangeConfirmation = async (account) => {
+        const params = new URLSearchParams(location.search);
+        const token = params.get("confirm-login-change");
+        if (!token) {
+            return { handled: false, valid: false };
+        }
+
+        history.replaceState(null, "", location.pathname);
+        let tokenIsValid = false;
+        try {
+            tokenIsValid = Boolean(account?.loginChangeTokenHash
+                && account.loginChangeExpires > Date.now()
+                && account.loginChangeRequestedEmail === account.email
+                && sessionStorage.getItem(sessionKey) === "active"
+                && await hashSecret(token, account.loginChangeTokenSalt) === account.loginChangeTokenHash);
+        } catch (error) {
+            console.error("Could not verify the local account-change confirmation.", error);
+            return {
+                handled: true,
+                valid: false,
+                message: "Could not verify confirmation in this browser."
+            };
+        }
+        if (!tokenIsValid) {
+            return {
+                handled: true,
+                valid: false,
+                message: "This account-change confirmation is invalid or has expired. Request a new one while logged in."
+            };
+        }
+
+        delete account.loginChangeTokenHash;
+        delete account.loginChangeTokenSalt;
+        delete account.loginChangeExpires;
+        delete account.loginChangeRequestedEmail;
+        try {
+            localStorage.setItem(accountKey, JSON.stringify(account));
+            sessionStorage.setItem(accountChangeSessionKey, String(Date.now() + 10 * 60 * 1000));
+            return { handled: true, valid: true };
+        } catch (error) {
+            console.error("Could not confirm the local admin account change.", error);
+            return {
+                handled: true,
+                valid: false,
+                message: "Could not save confirmation in this browser."
+            };
+        }
     };
 
     const setPassword = async (account, password) => {
@@ -128,27 +199,6 @@
         return true;
     };
 
-    const addLabel = (parent, title, control) => {
-        const label = document.createElement("label");
-        label.textContent = title;
-        label.append(control);
-        parent.append(label);
-        return control;
-    };
-
-    const makeInput = (value, type = "text") => {
-        const input = document.createElement("input");
-        input.type = type;
-        input.value = value || "";
-        return input;
-    };
-
-    const makeTextarea = (value) => {
-        const textarea = document.createElement("textarea");
-        textarea.value = value || "";
-        return textarea;
-    };
-
     const currentPageContent = (content, key) => {
         if (!content[key]) {
             content[key] = { fields: {}, lists: {} };
@@ -171,75 +221,14 @@
         price: item.querySelector(".item-price")?.textContent.trim() || ""
     });
 
-    const renderMenuRecord = (record, index, list) => {
-        const fieldset = document.createElement("fieldset");
-        fieldset.className = "menu-record";
-        const legend = document.createElement("legend");
-        legend.textContent = `Item ${index + 1}`;
-        fieldset.append(legend);
-
-        addLabel(fieldset, "Item title", makeInput(record.title));
-        addLabel(fieldset, "Description", makeTextarea(record.description));
-        addLabel(fieldset, "Price (optional)", makeInput(record.price));
-
-        const removeButton = document.createElement("button");
-        removeButton.type = "button";
-        removeButton.className = "remove-record";
-        removeButton.textContent = "Remove item";
-        removeButton.addEventListener("click", () => {
-            if (list.querySelectorAll(".menu-record").length <= 1) {
-                showMessage(saveMessage, "Keep at least one item in each list.");
-                return;
-            }
-            fieldset.remove();
-        });
-        fieldset.append(removeButton);
-        list.append(fieldset);
-    };
-
     const renderEditor = () => {
         const doc = preview.contentDocument;
         const pageApi = preview.contentWindow.ButlersAdminContent;
         if (!doc || !pageApi) {
-            showMessage(saveMessage, "The preview did not load the content editor helper.");
+            selectionMessage.textContent = "The preview did not load the content editor helper.";
             return;
         }
         const pageKey = pageApi.pageKey(doc);
-        const content = pageApi.readOverrides();
-        const pageContent = content[pageKey] || { fields: {}, lists: {} };
-        contentFields.replaceChildren();
-
-        const managedGroups = contentApi.getManagedGroups(doc);
-        if (managedGroups.length) {
-            managedGroups.forEach(({ id, node, label }) => {
-                const group = document.createElement("details");
-                const summary = document.createElement("summary");
-                summary.textContent = label;
-                group.append(summary);
-                const list = document.createElement("div");
-                list.className = "field-body";
-                list.dataset.listId = id;
-                const records = pageContent.lists?.[id]
-                    || Array.from(node.querySelectorAll(":scope > .menu-item")).map(readListItem);
-                records.forEach((record, index) => renderMenuRecord(record, index, list));
-
-                const addButton = document.createElement("button");
-                addButton.type = "button";
-                addButton.className = "add-record";
-                addButton.textContent = "Add item";
-                addButton.addEventListener("click", () => {
-                    renderMenuRecord({ title: "", description: "", price: "" }, list.children.length, list);
-                });
-                list.append(addButton);
-                group.append(list);
-                contentFields.append(group);
-            });
-        } else {
-            const emptyMessage = document.createElement("p");
-            emptyMessage.textContent = "This page has no menu-item lists. Click the preview to edit its text, images, and links.";
-            contentFields.append(emptyMessage);
-        }
-        saveMessage.textContent = `Editing ${pageNames[pageKey] || pageKey}.`;
         selectionTitle.textContent = "Edit the page";
         selectionHint.textContent = "Click a heading or paragraph in the preview to edit it in place. Select an image to replace it, or click a menu item to edit its details.";
         selectionMessage.textContent = "";
@@ -309,7 +298,7 @@
         activeSelection = { type: "item", node: item, group, pageKey, pageApi };
         item.classList.add("admin-edit-selected");
         selectionTitle.textContent = "Edit menu item";
-        selectionHint.textContent = "Edit this item's title, description, or price here. Add or remove rows under Manage menu items and specials.";
+        selectionHint.textContent = "Edit this item's title, description, or price here.";
         selectionMessage.textContent = "";
         imageTools.hidden = true;
         linkTools.hidden = true;
@@ -464,7 +453,6 @@
         const pageName = pageSelect.value;
         document.querySelector("#open-page-link").href = pageName;
         preview.src = `${pageName}?admin-preview=${Date.now()}`;
-        saveMessage.textContent = "Loading page preview…";
     };
 
     const initEditor = () => {
@@ -533,70 +521,6 @@
                 showMessage(selectionMessage, "Could not save the item. Browser storage may be full or unavailable.");
             }
         });
-        contentForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            const doc = preview.contentDocument;
-            const contentApi = preview.contentWindow.ButlersAdminContent;
-            if (!doc || !contentApi) {
-                showMessage(saveMessage, "The page preview is unavailable. Reload the selected page and try again.");
-                return;
-            }
-            const pageKey = contentApi.pageKey(doc);
-            let content;
-            try {
-                content = contentApi.readOverrides();
-            } catch (error) {
-                console.error("Could not read locally saved site content.", error);
-                showMessage(saveMessage, "Saved content could not be read. Browser storage may be unavailable.");
-                return;
-            }
-            const pageContent = currentPageContent(content, pageKey);
-
-            for (const control of contentFields.querySelectorAll("[data-field-id]")) {
-                const { fieldId, property } = control.dataset;
-                if (property === "src" || property === "href") {
-                    const checkedUrl = contentApi.safeUrl(control.value, doc.baseURI);
-                    if (checkedUrl === null || (property === "src" && !control.value.trim())) {
-                        control.setCustomValidity("Enter a valid http(s) URL or a relative site path.");
-                        control.reportValidity();
-                        control.setCustomValidity("");
-                        return;
-                    }
-                }
-                if (!pageContent.fields[fieldId]) {
-                    pageContent.fields[fieldId] = {};
-                }
-                pageContent.fields[fieldId][property] = control.value;
-            }
-
-            let hasInvalidTitle = false;
-            contentFields.querySelectorAll("[data-list-id]").forEach((list) => {
-                const records = Array.from(list.querySelectorAll(".menu-record")).map((record) => ({
-                    title: record.querySelector("input")?.value.trim() || "",
-                    description: record.querySelector("textarea")?.value.trim() || "",
-                    price: record.querySelectorAll("input")[1]?.value.trim() || ""
-                }));
-                if (records.some((record) => !record.title)) {
-                    showMessage(saveMessage, "Every menu item needs a title.");
-                    hasInvalidTitle = true;
-                    return;
-                }
-                pageContent.lists[list.dataset.listId] = records;
-            });
-            if (hasInvalidTitle) {
-                return;
-            }
-
-            try {
-                localStorage.setItem(contentApi.storageKey, JSON.stringify(content));
-            } catch (error) {
-                console.error("Could not save local site content.", error);
-                showMessage(saveMessage, "Could not save changes. Browser storage may be full or unavailable.");
-                return;
-            }
-            saveMessage.textContent = "Saved in this browser. Reload the preview to see the saved changes.";
-            loadSelectedPage();
-        });
     };
 
     const initialize = async () => {
@@ -612,6 +536,19 @@
 
         const showingReset = await setResetView();
         if (showingReset) {
+            return;
+        }
+
+        const accountChangeConfirmation = await consumeAccountChangeConfirmation(account);
+        if (accountChangeConfirmation.handled && !accountChangeConfirmation.valid) {
+            if (sessionStorage.getItem(sessionKey) === "active") {
+                accountChangeFlow.dataset.open = "true";
+                showEditor();
+                showMessage(accountChangeMessage, accountChangeConfirmation.message);
+            } else {
+                showLogin();
+                showMessage(loginMessage, accountChangeConfirmation.message);
+            }
             return;
         }
 
@@ -744,8 +681,88 @@
         }
     });
 
+    accountChangeStart.addEventListener("click", () => {
+        accountChangeFlow.dataset.open = "true";
+        renderAccountSettings();
+        accountChangeMessage.hidden = true;
+    });
+
+    accountConfirmationButton.addEventListener("click", async () => {
+        try {
+            const account = readAccount();
+            if (!account || sessionStorage.getItem(sessionKey) !== "active") {
+                showMessage(accountChangeMessage, "Log in again before changing the admin account.");
+                return;
+            }
+
+            const token = createToken();
+            account.loginChangeTokenSalt = createSalt();
+            account.loginChangeTokenHash = await hashSecret(token, account.loginChangeTokenSalt);
+            account.loginChangeRequestedEmail = account.email;
+            account.loginChangeExpires = Date.now() + 15 * 60 * 1000;
+            localStorage.setItem(accountKey, JSON.stringify(account));
+
+            const confirmationUrl = new URL("admin.html", location.href);
+            confirmationUrl.searchParams.set("confirm-login-change", token);
+            accountChangeMessage.replaceChildren();
+            accountChangeMessage.append(`Demo confirmation link for ${account.email} (not emailed): `);
+            const confirmationLink = document.createElement("a");
+            confirmationLink.href = confirmationUrl.href;
+            confirmationLink.textContent = "Confirm current email";
+            accountChangeMessage.append(confirmationLink);
+            accountChangeMessage.hidden = false;
+        } catch (error) {
+            console.error("Could not create the local account-change confirmation.", error);
+            showMessage(accountChangeMessage, "Could not create a confirmation link in this browser.");
+        }
+    });
+
+    accountChangeForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!hasAccountChangeAuthorization()) {
+            showMessage(accountChangeMessage, "Confirm the current admin email before changing this login.");
+            return;
+        }
+
+        const formData = new FormData(accountChangeForm);
+        const email = String(formData.get("email")).trim().toLowerCase();
+        const password = String(formData.get("password"));
+        const confirmPassword = String(formData.get("confirm-password"));
+        if (password.length < 12) {
+            showMessage(accountChangeMessage, "Use a password with at least 12 characters.");
+            return;
+        }
+        if (password !== confirmPassword) {
+            showMessage(accountChangeMessage, "The passwords do not match.");
+            return;
+        }
+
+        try {
+            const account = readAccount();
+            if (!account) {
+                showMessage(accountChangeMessage, "The local admin account could not be found.");
+                return;
+            }
+            account.email = email;
+            delete account.loginChangeTokenHash;
+            delete account.loginChangeTokenSalt;
+            delete account.loginChangeExpires;
+            delete account.loginChangeRequestedEmail;
+            await setPassword(account, password);
+            localStorage.setItem(accountKey, JSON.stringify(account));
+            sessionStorage.removeItem(accountChangeSessionKey);
+            accountChangeForm.reset();
+            renderAccountSettings();
+            showMessage(accountChangeMessage, "Admin login updated. Use the new email and password next time you log in.");
+        } catch (error) {
+            console.error("Could not update the local admin login.", error);
+            showMessage(accountChangeMessage, "Could not update the admin login. Browser storage may be unavailable.");
+        }
+    });
+
     document.querySelector("#logout-button").addEventListener("click", () => {
         sessionStorage.removeItem(sessionKey);
+        sessionStorage.removeItem(accountChangeSessionKey);
         location.href = "admin.html";
     });
 
