@@ -66,7 +66,7 @@ h6,
     padding: 20px 40px;
     background-color: var(--bg-footer-dark);
     background-image:
-        linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
         url("assets/weathered-gray-wood.png");
     background-position: center 38%;
     background-size: cover;
@@ -105,7 +105,6 @@ h6,
     justify-self: center;
     padding: 10px 16px;
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.25);
 }
 
 
@@ -238,7 +237,7 @@ h6,
     z-index: 2;
     background-color: var(--bg-footer-dark);
     background-image:
-        linear-gradient(rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.42)),
+        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
         url("assets/weathered-gray-wood.png");
     background-position: center;
     background-size: cover;
@@ -275,8 +274,6 @@ h6,
 
 .footer-info {
     padding: 24px;
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.25);
 }
 
 

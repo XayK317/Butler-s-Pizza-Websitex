@@ -59,7 +59,7 @@ h6,
   align-items: center;
   padding: 20px 40px;
   background-color: var(--bg-footer-dark);
-  background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url("assets/weathered-gray-wood.png");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("assets/weathered-gray-wood.png");
   background-position: center 38%;
   background-size: cover;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
@@ -93,7 +93,6 @@ h6,
   justify-self: center;
   padding: 10px 16px;
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.25);
 }
 
 .nav-links a {
@@ -209,7 +208,7 @@ h6,
   position: relative;
   z-index: 2;
   background-color: var(--bg-footer-dark);
-  background-image: linear-gradient(rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.42)), url("assets/weathered-gray-wood.png");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("assets/weathered-gray-wood.png");
   background-position: center;
   background-size: cover;
   color: #f4efdb;
@@ -242,8 +241,6 @@ h6,
 
 .footer-info {
   padding: 24px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.25);
 }
 
 .footer-section-title {

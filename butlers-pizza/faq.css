@@ -121,6 +121,7 @@
 }
 
 .job-application-submit {
+  margin-top: 18px;
   padding: 12px 22px;
   border: 2px solid #000;
   border-radius: 20px;
