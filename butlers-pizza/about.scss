@@ -17,14 +17,15 @@
     column-gap: 48px;
     row-gap: 18px;
     height: 560px;
-    padding: 40px 6%;
+    padding: 40px max(6%, calc(50vw - 528px));
     background-color: var(--bg-hero-yellow);
     background-image:
         linear-gradient(rgba(244, 171, 46, 0.84), rgba(244, 171, 46, 0.84)),
-        url("assets/butlers-brick-wall.jpg");
+        url("assets/butlers-brick-wall.jpg"),
+        url("assets/butlers-brick-texture.jpg");
     background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover, cover;
+    background-repeat: no-repeat, no-repeat, repeat;
+    background-size: 100% 100%, contain, min(25%, 259.3px) auto;
 }
 
 
@@ -71,9 +72,10 @@
 .media-section {
     position: relative;
     z-index: 4;
-    padding: 60px 40px 80px;
+    padding: 60px calc(40px + var(--wide-page-inset)) 80px;
     background-color: var(--bg-menu-cream);
     background-image: var(--checkerboard);
+    background-position: 0 2px;
     background-size: var(--checkerboard-size);
 }
 
@@ -113,9 +115,6 @@
     gap: 6px;
     max-width: 900px;
     margin: 0 auto;
-    background-color: var(--bg-menu-cream);
-    background-image: var(--checkerboard);
-    background-size: var(--checkerboard-size);
 }
 
 

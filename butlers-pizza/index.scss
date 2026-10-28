@@ -10,13 +10,15 @@
     z-index: 3;
     height: 560px;
     overflow: hidden;
+    padding-inline: var(--wide-page-inset);
     background-color: var(--bg-hero-yellow);
     background-image:
         linear-gradient(rgba(244, 171, 46, 0.84), rgba(244, 171, 46, 0.84)),
-        url("assets/butlers-brick-wall.jpg");
+        url("assets/butlers-brick-wall.jpg"),
+        url("assets/butlers-brick-texture.jpg");
     background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover, cover;
+    background-repeat: no-repeat, no-repeat, repeat;
+    background-size: 100% 100%, contain, min(25%, 259.3px) auto;
 }
 
 

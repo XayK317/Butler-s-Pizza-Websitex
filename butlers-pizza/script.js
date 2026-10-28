@@ -1,4 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const siteHeader = document.querySelector(".site-header");
+    if (siteHeader) {
+        const updateStickyHeaderHeight = () => {
+            document.documentElement.style.setProperty(
+                "--sticky-header-height",
+                `${siteHeader.getBoundingClientRect().height}px`
+            );
+        };
+        const headerResizeObserver = new ResizeObserver(updateStickyHeaderHeight);
+        headerResizeObserver.observe(siteHeader);
+        window.addEventListener("resize", updateStickyHeaderHeight);
+        updateStickyHeaderHeight();
+    }
+
     document.querySelectorAll(".map-placeholder").forEach((mapContainer) => {
         const map = mapContainer.querySelector(".map-embed");
         if (!map) {
