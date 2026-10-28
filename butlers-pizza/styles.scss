@@ -19,7 +19,6 @@
     --checkerboard-size: 64px 64px;
 }
 
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -63,10 +62,11 @@ h6,
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
+    min-height: var(--sticky-header-height);
     padding: 20px 40px;
     background-color: var(--bg-footer-dark);
     background-image:
-        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)),
         url("assets/weathered-gray-wood.png");
     background-position: center 38%;
     background-size: cover;
@@ -237,7 +237,7 @@ h6,
     z-index: 2;
     background-color: var(--bg-footer-dark);
     background-image:
-        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)),
         url("assets/weathered-gray-wood.png");
     background-position: center;
     background-size: cover;

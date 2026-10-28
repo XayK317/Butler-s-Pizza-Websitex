@@ -8,7 +8,7 @@
     position: sticky;
     top: var(--sticky-header-height);
     z-index: 3;
-    min-height: 560px;
+    height: 560px;
     overflow: hidden;
     background-color: var(--bg-hero-yellow);
     background-image:
@@ -21,6 +21,7 @@
 
 .quote-section {
     flex: 1;
+    min-width: 0;
     padding: 60px 40px;
     display: flex;
     flex-direction: column;
@@ -63,6 +64,7 @@
     flex-direction: column;
     justify-content: center;
     min-width: 0;
+    padding-right: 24px;
 }
 
 
@@ -223,6 +225,8 @@
 
     .hero-section {
         flex-direction: column;
+        height: auto;
+        min-height: 560px;
         padding-bottom: 50px;
     }
 
@@ -235,6 +239,10 @@
 
     .quote-section {
         min-height: 300px;
+    }
+
+    .hero-right {
+        padding: 0 40px;
     }
 
 
@@ -257,6 +265,10 @@
     .quote-section {
         min-height: 260px;
         padding: 40px 24px;
+    }
+
+    .hero-right {
+        padding: 0 24px;
     }
 
 

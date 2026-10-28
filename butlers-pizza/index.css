@@ -62,7 +62,7 @@
   position: sticky;
   top: var(--sticky-header-height);
   z-index: 3;
-  min-height: 560px;
+  height: 560px;
   overflow: hidden;
   background-color: var(--bg-hero-yellow);
   background-image: linear-gradient(rgba(244, 171, 46, 0.84), rgba(244, 171, 46, 0.84)), url("assets/butlers-brick-wall.jpg");
@@ -72,6 +72,7 @@
 
 .quote-section {
   flex: 1;
+  min-width: 0;
   padding: 60px 40px;
   display: flex;
   flex-direction: column;
@@ -110,6 +111,7 @@
   flex-direction: column;
   justify-content: center;
   min-width: 0;
+  padding-right: 24px;
 }
 
 .hero-image-placeholder {
@@ -248,6 +250,8 @@
 @media (max-width: 900px) {
   .hero-section {
     flex-direction: column;
+    height: auto;
+    min-height: 560px;
     padding-bottom: 50px;
   }
   .quote-section,
@@ -256,6 +260,9 @@
   }
   .quote-section {
     min-height: 300px;
+  }
+  .hero-right {
+    padding: 0 40px;
   }
   #menu > .section-heading {
     width: 100%;
@@ -269,6 +276,9 @@
   .quote-section {
     min-height: 260px;
     padding: 40px 24px;
+  }
+  .hero-right {
+    padding: 0 24px;
   }
   .hero-title {
     font-size: clamp(42px, 12vw, 64px);
