@@ -10,9 +10,9 @@
   --sticky-header-height: 76px;
   --wide-page-inset: max(0px, calc(50vw - 600px));
   --checkerboard: conic-gradient(
-      rgb(30 30 30 / 4.5%) 25%,
+      rgb(30 30 30 / 3.375%) 25%,
       transparent 0 50%,
-      rgb(30 30 30 / 4.5%) 0 75%,
+      rgb(30 30 30 / 3.375%) 0 75%,
       transparent 0
   );
   --checkerboard-size: 64px 64px;
