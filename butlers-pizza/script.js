@@ -1,3 +1,38 @@
+let adminShortcutTimer;
+let adminShortcutArmed = false;
+
+document.addEventListener("keydown", (event) => {
+    const target = event.target;
+    if (target instanceof HTMLElement
+        && (target.isContentEditable || target.matches("input, textarea, select"))) {
+        return;
+    }
+
+    if (event.ctrlKey && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "a") {
+        event.preventDefault();
+        adminShortcutArmed = true;
+        window.clearTimeout(adminShortcutTimer);
+        adminShortcutTimer = window.setTimeout(() => {
+            adminShortcutArmed = false;
+        }, 2500);
+        return;
+    }
+
+    if (adminShortcutArmed && event.ctrlKey && event.key.toLowerCase() === "d") {
+        event.preventDefault();
+        window.clearTimeout(adminShortcutTimer);
+        adminShortcutArmed = false;
+        window.location.href = "admin.html";
+    }
+});
+
+document.addEventListener("keyup", (event) => {
+    if (event.key === "Control") {
+        adminShortcutArmed = false;
+        window.clearTimeout(adminShortcutTimer);
+    }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     const siteHeader = document.querySelector(".site-header");
     if (siteHeader) {

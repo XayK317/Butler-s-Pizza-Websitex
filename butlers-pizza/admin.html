@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Admin Demo | Butler's Pizza</title>
+    <link rel="icon" type="image/png" href="assets/bplogo.png">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <main class="admin-shell">
+        <a class="back-link" href="index.html">Back to Butler's Pizza</a>
+        <section class="auth-panel" id="auth-panel">
+            <h1>Local Admin Demo</h1>
+            <p class="demo-warning"><strong>Local demo only.</strong> The account and content are saved in this browser. This is not secure authentication, changes do not publish to other devices, and password reset links are simulated instead of emailed.</p>
+
+            <form id="setup-form" hidden>
+                <h2>Create this browser's admin account</h2>
+                <label>Email
+                    <input name="email" type="email" autocomplete="email" required>
+                </label>
+                <label>Password
+                    <input name="password" type="password" autocomplete="new-password" minlength="12" required>
+                </label>
+                <label>Confirm password
+                    <input name="confirm-password" type="password" autocomplete="new-password" minlength="12" required>
+                </label>
+                <button type="submit">Create local admin account</button>
+                <p class="form-message" id="setup-message" role="alert" hidden></p>
+            </form>
+
+            <form id="login-form" hidden>
+                <h2>Admin login</h2>
+                <label>Email
+                    <input name="email" type="email" autocomplete="username" required>
+                </label>
+                <label>Password
+                    <input name="password" type="password" autocomplete="current-password" required>
+                </label>
+                <button type="submit">Admin log in</button>
+                <p class="form-message" id="login-message" role="alert" hidden></p>
+                <p class="admin-prompt" id="admin-prompt" hidden>Are you sure you're the admin?</p>
+                <button class="secondary-button" id="reset-request-button" type="button">Send reset link to email</button>
+                <p class="form-message" id="reset-message" role="status" hidden></p>
+            </form>
+
+            <form id="reset-form" hidden>
+                <h2>Set a new password</h2>
+                <p>This local demo reset link can only be used in this browser.</p>
+                <label>New password
+                    <input name="password" type="password" autocomplete="new-password" minlength="12" required>
+                </label>
+                <label>Confirm new password
+                    <input name="confirm-password" type="password" autocomplete="new-password" minlength="12" required>
+                </label>
+                <button type="submit">Save new password</button>
+                <p class="form-message" id="reset-form-message" role="alert" hidden></p>
+            </form>
+        </section>
+
+        <section class="editor-shell" id="editor-shell" hidden>
+            <header class="editor-header">
+                <div>
+                    <h1>Content editor</h1>
+                    <p>Changes are saved only in this browser.</p>
+                </div>
+                <button class="secondary-button" id="logout-button" type="button">Log out</button>
+            </header>
+            <div class="page-picker">
+                <label for="page-select">Page to edit</label>
+                <select id="page-select">
+                    <option value="index.html">Home</option>
+                    <option value="about.html">About / Media</option>
+                    <option value="menu.html">Menu</option>
+                    <option value="specials.html">Lunch Specials</option>
+                    <option value="catering.html">Catering</option>
+                    <option value="faq.html">FAQ's</option>
+                </select>
+                <a id="open-page-link" href="index.html" target="_blank" rel="noopener noreferrer">Open page in a new tab</a>
+            </div>
+            <div class="editor-workspace">
+                <aside class="content-editor">
+                    <section class="selection-panel" aria-live="polite">
+                        <h2 id="selection-title">Edit the page</h2>
+                        <p id="selection-hint">Click a heading or paragraph in the preview to edit it in place. Select an image to replace it, or click a menu item to edit its details.</p>
+
+                        <div id="image-tools" hidden>
+                            <label>Replace image
+                                <input id="image-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+                            </label>
+                            <div class="image-drop-zone" id="image-drop-zone">Drop an image here</div>
+                            <label>Or use an image URL/path
+                                <input id="image-url" type="text" placeholder="assets/new-photo.jpg">
+                            </label>
+                            <label>Image description (alt text)
+                                <input id="image-alt" type="text">
+                            </label>
+                            <button id="save-image" type="button">Save image</button>
+                        </div>
+
+                        <form id="link-tools" hidden>
+                            <label>Link text
+                                <input id="link-text" type="text">
+                            </label>
+                            <label>Link destination
+                                <input id="link-href" type="text">
+                            </label>
+                            <button type="submit">Save link</button>
+                        </form>
+
+                        <div id="item-tools" hidden>
+                            <label>Item title
+                                <input id="item-title" type="text">
+                            </label>
+                            <label>Description
+                                <textarea id="item-description"></textarea>
+                            </label>
+                            <label>Price (optional)
+                                <input id="item-price" type="text">
+                            </label>
+                            <button id="save-item" type="button">Save item</button>
+                        </div>
+                        <p class="selection-message" id="selection-message" role="status"></p>
+                    </section>
+
+                    <details class="list-manager">
+                        <summary>Manage menu items and specials</summary>
+                        <form id="content-form">
+                            <div class="content-fields" id="content-fields">
+                                <p>Select a page to load its item lists.</p>
+                            </div>
+                            <div class="save-bar">
+                                <p id="save-message" role="status" aria-live="polite"></p>
+                                <button type="submit">Save lists</button>
+                            </div>
+                        </form>
+                    </details>
+                </aside>
+                <iframe class="page-preview" id="page-preview" title="Selected website page preview"></iframe>
+            </div>
+        </section>
+    </main>
+    <script src="admin-content.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
