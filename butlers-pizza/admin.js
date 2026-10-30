@@ -212,14 +212,113 @@
         return content[key];
     };
 
-    const readListItem = (item) => ({
-        title: item.querySelector(".item-text h3")?.textContent.trim() || "",
-        description: Array.from(item.querySelectorAll(".item-text p"))
-            .map((paragraph) => paragraph.textContent.trim())
-            .filter(Boolean)
-            .join("\n"),
-        price: item.querySelector(".item-price")?.textContent.trim() || ""
-    });
+    const readListItem = (item) => {
+        if (item.matches("li")) {
+            return {
+                title: item.querySelector("span")?.textContent.trim() || "",
+                description: "",
+                price: item.querySelector("strong")?.textContent.trim() || ""
+            };
+        }
+        return {
+            title: item.querySelector(".item-text h3")?.textContent.trim() || "",
+            description: Array.from(item.querySelectorAll(".item-text p"))
+                .map((paragraph) => paragraph.textContent.trim())
+                .filter(Boolean)
+                .join("\n"),
+            price: item.querySelector(".item-price")?.textContent.trim() || ""
+        };
+    };
+
+    const newItemDefaults = {
+        menu: { title: "NEW ITEM", description: "Describe this item.", price: "$0.00" },
+        coupon: { title: "NEW DEAL", description: "Describe this deal.", price: "" },
+        discount: { title: "New Discount", description: "", price: "10%" }
+    };
+
+    const addLabels = { menu: "+ Add item", coupon: "+ Add deal", discount: "+ Add discount" };
+
+    const saveGroupRecords = (group, pageKey) => {
+        try {
+            const content = contentApi.readOverrides();
+            const pageContent = currentPageContent(content, pageKey);
+            pageContent.lists[group.id] = Array.from(group.node.querySelectorAll(group.itemSelector)).map(readListItem);
+            localStorage.setItem(contentApi.storageKey, JSON.stringify(content));
+            return true;
+        } catch (error) {
+            console.error("Could not save this section.", error);
+            showMessage(selectionMessage, "Could not save this change. Browser storage may be full or unavailable.");
+            return false;
+        }
+    };
+
+    const refreshItemControls = (doc, pageApi) => {
+        doc.querySelectorAll(".admin-control").forEach((control) => control.remove());
+        pageApi.getManagedGroups(doc).forEach((group) => {
+            group.node.querySelectorAll(group.itemSelector).forEach((item) => {
+                item.classList.add("admin-has-controls");
+                const deleteButton = doc.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "admin-control admin-delete-item";
+                deleteButton.textContent = "×";
+                deleteButton.setAttribute("aria-label", "Delete this item");
+                deleteButton.title = "Delete this item";
+                item.append(deleteButton);
+            });
+            const addButton = doc.createElement("button");
+            addButton.type = "button";
+            addButton.className = "admin-control admin-add-item";
+            addButton.textContent = addLabels[group.kind];
+            if (group.kind === "discount") {
+                group.node.after(addButton);
+            } else {
+                group.node.append(addButton);
+            }
+        });
+    };
+
+    const clearItemSelection = () => {
+        hideSelectedOutline();
+        activeSelection = null;
+        itemTools.hidden = true;
+        selectionTitle.textContent = "Edit the page";
+    };
+
+    const addGroupItem = (doc, pageApi, pageKey, addButton) => {
+        const group = pageApi.getManagedGroups(doc).find(({ node }) => node === addButton.parentElement
+            || node.nextElementSibling === addButton);
+        if (!group) {
+            return;
+        }
+        const newItem = pageApi.createGroupItem(doc, group, newItemDefaults[group.kind]);
+        if (group.kind === "discount") {
+            group.node.append(newItem);
+        } else {
+            group.node.insertBefore(newItem, addButton);
+        }
+        if (saveGroupRecords(group, pageKey)) {
+            refreshItemControls(doc, pageApi);
+            selectMenuItem(newItem, group, pageKey, pageApi);
+            newItem.scrollIntoView({ block: "center", behavior: "smooth" });
+            selectionMessage.textContent = "Added and saved. Edit its details in the left panel.";
+        }
+    };
+
+    const deleteGroupItem = (doc, pageApi, pageKey, deleteButton) => {
+        const item = deleteButton.parentElement;
+        const group = pageApi.getManagedGroups(doc).find(({ node }) => node.contains(item));
+        if (!group) {
+            return;
+        }
+        if (activeSelection?.node === item) {
+            clearItemSelection();
+        }
+        item.remove();
+        if (saveGroupRecords(group, pageKey)) {
+            refreshItemControls(doc, pageApi);
+            selectionMessage.textContent = "Item deleted and saved.";
+        }
+    };
 
     const renderEditor = () => {
         const doc = preview.contentDocument;
@@ -230,7 +329,7 @@
         }
         const pageKey = pageApi.pageKey(doc);
         selectionTitle.textContent = "Edit the page";
-        selectionHint.textContent = "Click a heading or paragraph in the preview to edit it in place. Select an image to replace it, or click a menu item to edit its details.";
+        selectionHint.textContent = "Click a heading or paragraph in the preview to edit it in place. Select an image to replace it, or click a menu item to edit its details. Use + to add an item to a section and × to delete one.";
         selectionMessage.textContent = "";
         imageTools.hidden = true;
         linkTools.hidden = true;
@@ -303,11 +402,12 @@
         imageTools.hidden = true;
         linkTools.hidden = true;
         itemTools.hidden = false;
-        document.querySelector("#item-title").value = item.querySelector(".item-text h3")?.textContent.trim() || "";
+        document.querySelector("#item-title").value = readListItem(item).title;
         document.querySelector("#item-description").value = Array.from(item.querySelectorAll(".item-text p"))
             .map((paragraph) => paragraph.textContent.trim())
             .join("\n");
-        document.querySelector("#item-price").value = item.querySelector(".item-price")?.textContent.trim() || "";
+        document.querySelector("#item-price").value = readListItem(item).price;
+        document.querySelector("#item-description").closest("label, .field")?.toggleAttribute("hidden", group.kind === "discount");
     };
 
     const persistImage = async (source, alt) => {
@@ -348,16 +448,40 @@
 
     const attachPreviewEditor = (doc, pageApi, pageKey) => {
         activeSelection = null;
-        const style = doc.createElement("style");
-        style.textContent = ".admin-edit-selected{outline:3px solid #d13014!important;outline-offset:3px;cursor:text}.admin-edit-selected img{outline:3px solid #d13014!important;outline-offset:3px}";
-        doc.head.append(style);
+        if (!doc.querySelector("#admin-preview-style")) {
+            const style = doc.createElement("style");
+            style.id = "admin-preview-style";
+            style.textContent = ".admin-edit-selected{outline:3px solid #d13014!important;outline-offset:3px;cursor:text}.admin-edit-selected img{outline:3px solid #d13014!important;outline-offset:3px}"
+                + ".admin-has-controls{position:relative}"
+                + ".admin-control{font:700 14px/1 sans-serif;cursor:pointer}"
+                + ".admin-delete-item{position:absolute;top:-8px;right:-8px;z-index:5;width:26px;height:26px;padding:0;border:2px solid #fff;border-radius:50%;background:#d13014;color:#fff;font-size:18px}"
+                + ".admin-add-item{grid-column:1/-1;align-self:flex-start;margin:12px auto 0;padding:10px 18px;border:2px dashed #d13014;border-radius:20px;background:rgba(255,255,255,.7);color:#d13014}"
+                + ".admin-add-item:hover,.admin-delete-item:hover{filter:brightness(.9)}";
+            doc.head.append(style);
+        }
+        refreshItemControls(doc, pageApi);
+        if (doc.adminEditorAttached) {
+            return;
+        }
+        doc.adminEditorAttached = true;
 
         doc.addEventListener("click", (event) => {
             const target = event.target?.nodeType === 1 ? event.target : null;
             if (!target) {
                 return;
             }
-            const menuItem = target.closest(".menu-item");
+            const control = target.closest(".admin-control");
+            if (control) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                if (control.classList.contains("admin-add-item")) {
+                    addGroupItem(doc, pageApi, pageKey, control);
+                } else {
+                    deleteGroupItem(doc, pageApi, pageKey, control);
+                }
+                return;
+            }
+            const menuItem = target.closest(".menu-item, .discount-section li");
             if (menuItem) {
                 const group = pageApi.getManagedGroups(doc).find(({ node }) => node.contains(menuItem));
                 if (group) {
@@ -493,7 +617,7 @@
             if (!activeSelection || activeSelection.type !== "item") {
                 return;
             }
-            const groupItems = Array.from(activeSelection.group.node.querySelectorAll(":scope > .menu-item"));
+            const groupItems = Array.from(activeSelection.group.node.querySelectorAll(activeSelection.group.itemSelector));
             const itemIndex = groupItems.indexOf(activeSelection.node);
             if (itemIndex < 0) {
                 return;

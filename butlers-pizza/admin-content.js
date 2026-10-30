@@ -28,12 +28,36 @@
             };
         });
 
-        Array.from(doc.querySelectorAll("main img")).forEach((node, index) => {
+        let imageIndex = 0;
+        const galleryStates = new Map();
+        Array.from(doc.querySelectorAll("main img")).forEach((node) => {
+            const gallery = node.closest("[data-carousel], .media-gallery-collage");
+            let fieldIndex = imageIndex;
+            if (gallery) {
+                // Gallery photos keep their original ids so added or removed photos never renumber later images.
+                let state = galleryStates.get(gallery);
+                if (!state) {
+                    state = {
+                        base: imageIndex,
+                        seen: 0,
+                        original: Number(gallery.dataset.adminOriginalCount) || gallery.querySelectorAll("img").length
+                    };
+                    galleryStates.set(gallery, state);
+                    imageIndex += state.original;
+                }
+                fieldIndex = state.base + state.seen;
+                state.seen += 1;
+                if (state.seen > state.original) {
+                    return;
+                }
+            } else {
+                imageIndex += 1;
+            }
             fields.push({
-                id: `image-${index}`,
+                id: `image-${fieldIndex}`,
                 kind: "image",
                 node,
-                label: `Image ${index + 1}: ${node.alt || node.getAttribute("src") || "No description"}`
+                label: `Image ${fieldIndex + 1}: ${node.alt || node.getAttribute("src") || "No description"}`
             });
         });
 
@@ -54,17 +78,18 @@
             "#menu > .menu-columns > .menu-column",
             "main.menu-page-content > .menu-columns > .menu-column",
             ".coupon-section .menu-columns > .menu-column",
-            ".menu-category-items"
+            ".menu-category-items",
+            ".discount-section > ul"
         ];
         const groups = [];
         groupSelectors.forEach((selector) => {
             doc.querySelectorAll(selector).forEach((node) => {
-                if (!node.querySelector(".menu-item")) {
-                    return;
-                }
+                const isDiscount = node.matches(".discount-section > ul");
                 let id = `${selector.replace(/[^a-z0-9]+/gi, "-")}-${groups.length}`;
                 const category = node.closest(".menu-category");
-                if (category?.id) {
+                if (isDiscount) {
+                    id = `discount-${Array.from(doc.querySelectorAll(".discount-section > ul")).indexOf(node)}`;
+                } else if (category?.id) {
                     id = `category-${category.id}`;
                 } else if (node.closest(".coupon-section")) {
                     id = `coupon-${Array.from(doc.querySelectorAll(".coupon-section .menu-columns > .menu-column")).indexOf(node)}`;
@@ -76,12 +101,143 @@
                 groups.push({
                     id,
                     node,
+                    itemSelector: isDiscount ? ":scope > li:not(.admin-control)" : ":scope > .menu-item",
+                    kind: isDiscount ? "discount" : (node.closest(".coupon-section") ? "coupon" : "menu"),
                     label: category?.querySelector("h2")?.textContent.trim()
-                        || (node.closest(".coupon-section") ? `Coupons ${groups.length + 1}` : `Lunch specials ${groups.length + 1}`)
+                        || (isDiscount ? "Discounts" : (node.closest(".coupon-section") ? `Coupons ${groups.length + 1}` : `Lunch specials ${groups.length + 1}`))
                 });
             });
         });
         return groups;
+    };
+
+    const getGalleryGroups = (doc = document) => {
+        const groups = [];
+        doc.querySelectorAll("[data-carousel]").forEach((node, index) => {
+            groups.push({
+                id: `carousel-${index}`,
+                kind: "carousel",
+                node,
+                itemSelector: ":scope > .carousel-slide",
+                minimum: 3
+            });
+        });
+        doc.querySelectorAll(".media-gallery-collage").forEach((node, index) => {
+            groups.push({
+                id: `collage-${index}`,
+                kind: "collage",
+                node,
+                itemSelector: ":scope > .media-gallery-item",
+                minimum: Number(node.dataset.adminOriginalCount) || node.querySelectorAll(":scope > .media-gallery-item").length
+            });
+        });
+        return groups;
+    };
+
+    const markGalleryOriginals = (doc = document) => {
+        getGalleryGroups(doc).forEach(({ node, itemSelector }) => {
+            if (!node.dataset.adminOriginalCount) {
+                node.dataset.adminOriginalCount = String(node.querySelectorAll(itemSelector).length);
+            }
+        });
+    };
+
+    const galleryImage = (item) => (item.matches("img") ? item : item.querySelector("img"));
+
+    const clampNumber = (value, min, max, fallback) => {
+        const number = Number(value);
+        return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback;
+    };
+
+    const readCrop = (img) => ({
+        x: clampNumber(img.dataset.cropX, 0, 100, 50),
+        y: clampNumber(img.dataset.cropY, 0, 100, 50),
+        zoom: clampNumber(img.dataset.cropZoom, 100, 300, 100)
+    });
+
+    const applyCrop = (img, crop) => {
+        const x = clampNumber(crop?.x, 0, 100, 50);
+        const y = clampNumber(crop?.y, 0, 100, 50);
+        const zoom = clampNumber(crop?.zoom, 100, 300, 100);
+        if (x === 50 && y === 50 && zoom === 100) {
+            ["object-position", "transform-origin", "transform"].forEach((property) => img.style.removeProperty(property));
+            delete img.dataset.cropX;
+            delete img.dataset.cropY;
+            delete img.dataset.cropZoom;
+            return;
+        }
+        img.style.objectPosition = `${x}% ${y}%`;
+        img.style.transformOrigin = `${x}% ${y}%`;
+        img.style.transform = zoom > 100 ? `scale(${zoom / 100})` : "";
+        img.dataset.cropX = String(x);
+        img.dataset.cropY = String(y);
+        img.dataset.cropZoom = String(zoom);
+    };
+
+    const readGalleryRecord = (item) => {
+        const img = galleryImage(item);
+        return {
+            src: img.getAttribute("src") || "",
+            alt: img.getAttribute("alt") || "",
+            ...readCrop(img)
+        };
+    };
+
+    const setGalleryRecord = (item, record, baseUri) => {
+        const img = galleryImage(item);
+        if (typeof record.src === "string") {
+            const source = safeUrl(record.src, baseUri);
+            if (source) {
+                img.setAttribute("src", source);
+            }
+        }
+        if (typeof record.alt === "string") {
+            img.setAttribute("alt", record.alt);
+        }
+        applyCrop(img, record);
+    };
+
+    const createGalleryItem = (doc, group, record) => {
+        const img = doc.createElement("img");
+        let item = img;
+        if (group.kind === "carousel") {
+            img.className = "carousel-slide";
+            img.hidden = true;
+            img.setAttribute("aria-hidden", "true");
+        } else {
+            item = doc.createElement("div");
+            item.className = "media-gallery-item";
+            item.append(img);
+        }
+        setGalleryRecord(item, record, doc.baseURI);
+        return item;
+    };
+
+    const syncCarouselIndicators = (node, preferredIndex) => {
+        const doc = node.ownerDocument;
+        const container = node.querySelector(".carousel-indicators");
+        const slides = Array.from(node.querySelectorAll(":scope > .carousel-slide"));
+        if (!container || slides.length === 0) {
+            return;
+        }
+        let activeIndex = Number.isInteger(preferredIndex) ? preferredIndex : slides.findIndex((slide) => !slide.hidden);
+        activeIndex = Math.min(slides.length - 1, Math.max(0, activeIndex));
+        slides.forEach((slide, index) => {
+            slide.hidden = index !== activeIndex;
+            slide.setAttribute("aria-hidden", String(index !== activeIndex));
+        });
+        container.replaceChildren(...slides.map((slide, index) => {
+            const indicator = doc.createElement("button");
+            indicator.type = "button";
+            indicator.className = index === activeIndex ? "carousel-indicator is-active" : "carousel-indicator";
+            indicator.dataset.carouselSlide = String(index);
+            indicator.setAttribute("aria-label", `Show photo ${index + 1}`);
+            if (index === activeIndex) {
+                indicator.setAttribute("aria-current", "true");
+            }
+            return indicator;
+        }));
+        node.dispatchEvent(new doc.defaultView.CustomEvent("carousel:refresh", { detail: { index: activeIndex } }));
     };
 
     const safeUrl = (value, baseUri) => {
@@ -113,6 +269,21 @@
     };
 
     const setMenuItem = (item, record) => {
+        if (item.matches("li")) {
+            let label = item.querySelector("span");
+            let value = item.querySelector("strong");
+            if (!label) {
+                label = item.ownerDocument.createElement("span");
+                item.prepend(label);
+            }
+            if (!value) {
+                value = item.ownerDocument.createElement("strong");
+                item.append(value);
+            }
+            setPlainText(label, record.title || "");
+            value.textContent = record.price || "";
+            return;
+        }
         const title = item.querySelector(".item-text h3");
         const textContainer = item.querySelector(".item-text");
         if (title) {
@@ -143,7 +314,27 @@
         }
     };
 
+    const createGroupItem = (doc, group, record) => {
+        const existingItem = group.node.querySelector(group.itemSelector);
+        let item;
+        if (existingItem) {
+            item = existingItem.cloneNode(true);
+            item.querySelectorAll(".admin-control").forEach((control) => control.remove());
+            item.classList.remove("admin-edit-selected");
+            item.removeAttribute("contenteditable");
+        } else if (group.kind === "discount") {
+            item = doc.createElement("li");
+        } else {
+            item = doc.createElement("article");
+            item.className = "menu-item";
+            item.innerHTML = '<div class="item-text"><h3></h3></div>';
+        }
+        setMenuItem(item, record);
+        return item;
+    };
+
     const applyOverrides = (doc = document) => {
+        markGalleryOriginals(doc);
         let content;
         try {
             content = readOverrides();
@@ -186,25 +377,18 @@
             }
         });
 
-        const template = doc.querySelector(".menu-item");
-        if (!template) {
-            return;
-        }
-        getManagedGroups(doc).forEach(({ id, node }) => {
+        getManagedGroups(doc).forEach((group) => {
+            const { id, node } = group;
             const records = pageContent.lists?.[id];
             if (!Array.isArray(records)) {
                 return;
             }
-            const originalItems = Array.from(node.querySelectorAll(":scope > .menu-item"));
-            const rowTemplate = originalItems[0] || doc.createElement("article");
+            const originalItems = Array.from(node.querySelectorAll(group.itemSelector));
             let insertionMarker = null;
-            if (!rowTemplate.matches(".menu-item")) {
-                rowTemplate.className = "menu-item";
-                rowTemplate.innerHTML = '<div class="item-text"><h3></h3></div>';
-            }
             if (originalItems.length === 0 && records.length === 0) {
                 return;
             }
+            const rowTemplate = createGroupItem(doc, group, {});
             if (originalItems[0]) {
                 insertionMarker = doc.createComment("");
                 node.insertBefore(insertionMarker, originalItems[0]);
@@ -233,6 +417,7 @@
         getEditableFields,
         getManagedGroups,
         setMenuItem,
+        createGroupItem,
         setPlainText,
         safeUrl,
         applyOverrides
