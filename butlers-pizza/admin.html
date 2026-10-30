@@ -75,6 +75,7 @@
                     <option value="specials.html">Lunch Specials</option>
                     <option value="catering.html">Catering</option>
                     <option value="faq.html">FAQ's</option>
+                    <option value="menu-photos.html">Menu Pictures</option>
                 </select>
                 <a id="open-page-link" href="index.html" target="_blank" rel="noopener noreferrer">Open page in a new tab</a>
             </div>
@@ -83,6 +84,15 @@
                     <section class="selection-panel" aria-live="polite">
                         <h2 id="selection-title">Edit the page</h2>
                         <p id="selection-hint">Click a heading or paragraph in the preview to edit it in place. Select an image to replace it, or click a menu item to edit its details. Use + to add an item to a section and × to delete one.</p>
+
+                        <div id="photo-downloads" hidden>
+                            <p class="crop-title">Download menu pictures</p>
+                            <p id="photo-download-status">Save an edit to enable the downloads.</p>
+                            <button class="secondary-button" type="button" data-download-poster="0" disabled>Download Signature Pizzas</button>
+                            <button class="secondary-button" type="button" data-download-poster="1" disabled>Download Lunch Special</button>
+                            <button class="secondary-button" type="button" data-download-poster="2" disabled>Download Sandwiches</button>
+                            <button class="secondary-button" type="button" data-download-poster="all" disabled>Download all three (choose a folder)</button>
+                        </div>
 
                         <div id="image-tools" hidden>
                             <label>Replace image

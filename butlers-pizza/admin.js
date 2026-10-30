@@ -36,6 +36,8 @@
     const cropY = document.querySelector("#crop-y");
     const cropZoom = document.querySelector("#crop-zoom");
     const contentApi = window.ButlersAdminContent;
+    const photoDownloads = document.querySelector("#photo-downloads");
+    const photoDownloadStatus = document.querySelector("#photo-download-status");
     let activeResetToken = "";
     let activeSelection = null;
 
@@ -438,6 +440,91 @@
         }
     };
 
+    const setDownloadsEnabled = (enabled) => {
+        photoDownloads.querySelectorAll("button").forEach((button) => {
+            button.disabled = !enabled;
+        });
+        photoDownloadStatus.textContent = enabled
+            ? "Your saved edits are ready. Download the updated photos."
+            : "Save an edit to enable the downloads.";
+    };
+
+    const posterToBlob = (poster) => new Promise((resolve, reject) => {
+        const clone = poster.cloneNode(true);
+        clone.querySelectorAll(".admin-control").forEach((node) => node.remove());
+        [clone, ...clone.querySelectorAll("*")].forEach((node) => {
+            node.classList.remove("admin-edit-selected", "admin-has-controls");
+            node.removeAttribute("contenteditable");
+            if (!node.getAttribute("class")) {
+                node.removeAttribute("class");
+            }
+        });
+        clone.style.transform = "";
+        const doc = poster.ownerDocument;
+        const css = doc.querySelector("#poster-style").textContent + (doc.defaultView.MENU_PHOTO_FONT || "");
+        const body = new XMLSerializer().serializeToString(clone);
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1365" height="768"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>${css.replace(/\]\]>/g, "")}</style>${body}</div></foreignObject></svg>`;
+        const image = new Image();
+        image.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 2730;
+            canvas.height = 1536;
+            const context = canvas.getContext("2d");
+            context.scale(2, 2);
+            context.drawImage(image, 0, 0, 1365, 768);
+            canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not create the image."))), "image/png");
+        };
+        image.onerror = () => reject(new Error("Could not render the photo."));
+        image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    });
+
+    const downloadPosters = async (which) => {
+        const posters = Array.from(preview.contentDocument?.querySelectorAll(".poster") || []);
+        const chosen = which === "all" ? posters : [posters[Number(which)]].filter(Boolean);
+        const fileName = (poster) => `${poster.dataset.poster || "Menu Photo"}.png`;
+        const canPick = typeof window.showSaveFilePicker === "function" && typeof window.showDirectoryPicker === "function";
+        try {
+            // Pickers must open straight from the click, before the slower image rendering.
+            let targets = null;
+            if (canPick) {
+                if (which === "all") {
+                    const folder = await window.showDirectoryPicker({ mode: "readwrite" });
+                    targets = await Promise.all(chosen.map((poster) => folder.getFileHandle(fileName(poster), { create: true })));
+                } else {
+                    targets = [await window.showSaveFilePicker({
+                        suggestedName: fileName(chosen[0]),
+                        types: [{ description: "PNG image", accept: { "image/png": [".png"] } }]
+                    })];
+                }
+            }
+            photoDownloadStatus.textContent = "Preparing download...";
+            for (const [index, poster] of chosen.entries()) {
+                const blob = await posterToBlob(poster);
+                if (targets) {
+                    const writable = await targets[index].createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    continue;
+                }
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName(poster);
+                document.body.append(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+            }
+            photoDownloadStatus.textContent = "Saved to the location you chose.";
+        } catch (error) {
+            if (error?.name === "AbortError") {
+                photoDownloadStatus.textContent = "Download cancelled.";
+                return;
+            }
+            console.error(error);
+            photoDownloadStatus.textContent = "Could not create the download. Try again.";
+        }
+    };
+
     const renderEditor = () => {
         const doc = preview.contentDocument;
         const pageApi = preview.contentWindow.ButlersAdminContent;
@@ -446,6 +533,11 @@
             return;
         }
         const pageKey = pageApi.pageKey(doc);
+        photoDownloads.hidden = pageKey !== "menu-photos.html";
+        if (!photoDownloads.hidden) {
+            const saved = pageApi.readOverrides()[pageKey];
+            setDownloadsEnabled(Boolean(saved && Object.keys(saved.fields || {}).length));
+        }
         selectionTitle.textContent = "Edit the page";
         selectionHint.textContent = "Click a heading or paragraph in the preview to edit it in place. Select an image to replace it, or click a menu item to edit its details. Use + to add an item to a section and × to delete one.";
         selectionMessage.textContent = "";
@@ -608,6 +700,20 @@
             doc.head.append(style);
         }
         refreshItemControls(doc, pageApi);
+        const previewNav = doc.querySelector(".site-header nav");
+        if (previewNav && !previewNav.querySelector(".admin-nav-tab")) {
+            const tab = doc.createElement("a");
+            tab.className = "admin-nav-tab";
+            tab.href = "menu-photos.html";
+            tab.textContent = "MENU PICTURES";
+            tab.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                pageSelect.value = "menu-photos.html";
+                loadSelectedPage();
+            });
+            previewNav.append(tab);
+        }
         if (doc.adminEditorAttached) {
             return;
         }
@@ -741,6 +847,13 @@
     };
 
     const loadSelectedPage = () => {
+        const requested = new URLSearchParams(location.search).get("page");
+        if (requested && !loadSelectedPage.applied) {
+            loadSelectedPage.applied = true;
+            if (Array.from(pageSelect.options).some((option) => option.value === requested)) {
+                pageSelect.value = requested;
+            }
+        }
         const pageName = pageSelect.value;
         document.querySelector("#open-page-link").href = pageName;
         preview.src = `${pageName}?admin-preview=${Date.now()}`;
@@ -748,6 +861,14 @@
 
     const initEditor = () => {
         pageSelect.addEventListener("change", loadSelectedPage);
+        photoDownloads.querySelectorAll("button").forEach((button) => {
+            button.addEventListener("click", () => downloadPosters(button.dataset.downloadPoster));
+        });
+        new MutationObserver(() => {
+            if (!photoDownloads.hidden && /saved/i.test(selectionMessage.textContent)) {
+                setDownloadsEnabled(true);
+            }
+        }).observe(selectionMessage, { childList: true, characterData: true, subtree: true });
         preview.addEventListener("load", renderEditor);
         imageFile.addEventListener("change", () => readImageFile(imageFile.files?.[0]));
         imageDropZone.addEventListener("dragover", (event) => {

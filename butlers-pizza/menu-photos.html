@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Menu Pictures | Butler's Pizza Admin</title>
+    <link rel="icon" type="image/png" href="assets/bplogo.png">
+    <style id="poster-style">
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        .poster {
+            position: relative;
+            width: 1365px;
+            height: 768px;
+            overflow: hidden;
+            background-color: #eadebc;
+            background-image: conic-gradient(rgb(30 30 30 / 3.375%) 25%, transparent 0 50%, rgb(30 30 30 / 3.375%) 0 75%, transparent 0);
+            background-size: 64px 64px;
+            background-position: 0 2px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #111;
+        }
+        .poster .top-border { position: absolute; top: 0; left: 0; right: 0; height: 18px; background: #d13014; }
+        .poster .page { position: absolute; top: 18px; left: 0; right: 0; bottom: 0; padding: 14px 70px 0; }
+        .poster h1, .poster h2 { font-family: "Kaushan Script", cursive; font-weight: 400; color: #d13014; text-align: center; letter-spacing: 1px; }
+        .poster h1 { font-size: 56px; line-height: 1.1; }
+        .poster h2 { font-size: 44px; line-height: 1.1; }
+        .poster .rule { height: 0; border-top: 5px solid #111; border-bottom: 2px solid #111; padding-top: 3px; }
+        .poster .row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+        .poster .price, .poster h3 { font-weight: 900; }
+        .poster .price { white-space: nowrap; }
+
+        .sig .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 50px; margin-top: 8px; }
+        .sig .item { margin-bottom: 6px; }
+        .sig .item h3 { font-size: 21px; text-transform: uppercase; letter-spacing: 1px; }
+        .sig .item p { font-size: 16.5px; line-height: 1.3; font-weight: 600; margin-top: 2px; }
+        .sig .center { text-align: center; grid-column: 1 / -1; }
+        .sig .rule { margin: 8px 0 4px; }
+        .sig .toppings { text-align: center; font-size: 18px; line-height: 1.35; font-weight: 700; margin: 4px 0 6px; }
+        .sig .grid { width: 760px; margin: 0 auto; }
+        .sig .grid .row { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 0; border-bottom: 1px solid rgb(17 17 17 / 25%); }
+        .sig .grid .row p { font-size: 19px; font-weight: 800; text-align: center; padding: 1px 10px; }
+        .sig .grid .row p:first-child { text-align: left; }
+        .sig .grid .head { border-bottom: 3px solid #111; }
+        .sig .grid .head p { font-weight: 900; }
+        .sig .note { text-align: center; font-size: 20px; font-weight: 900; margin-top: 8px; }
+
+        .lunch .page { padding-top: 22px; }
+        .lunch .sub { text-align: center; font-size: 22px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-top: 6px; }
+        .lunch .hours { text-align: center; font-size: 48px; font-weight: 900; margin: 2px 0 14px; }
+        .lunch .rule { margin: 0 auto 26px; width: 900px; }
+        .lunch .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 70px; padding: 0 10px; }
+        .lunch .item { margin-bottom: 26px; }
+        .lunch .item h3 { font-size: 25px; text-transform: uppercase; letter-spacing: .5px; }
+        .lunch .item .price { font-size: 25px; line-height: normal; margin-top: 0; font-weight: 900; }
+        .lunch .item p { font-size: 20px; line-height: 1.35; font-weight: 600; margin-top: 5px; }
+
+        .sand .page { padding: 10px 60px 0; }
+        .sand .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; margin-top: 8px; }
+        .sand .item { margin-bottom: 10px; }
+        .sand .item h3 { font-size: 21px; text-transform: uppercase; }
+        .sand .item .price { font-size: 21px; line-height: normal; margin-top: 0; font-weight: 900; }
+        .sand .item p { font-size: 15.5px; line-height: 1.28; font-weight: 600; margin-top: 2px; }
+        .sand .rule { margin: 6px 0 2px; }
+        .sand .lower { display: grid; grid-template-columns: 1fr 1.25fr; gap: 0 56px; }
+        .sand h2 { font-size: 40px; margin-bottom: 4px; }
+        .sand .line { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgb(17 17 17 / 25%); padding: 3px 0; }
+        .sand .line p { font-size: 18.5px; font-weight: 800; }
+        .sand .line p:last-child { font-weight: 900; white-space: nowrap; }
+        .sand .sauces { font-size: 17px; font-weight: 800; margin-top: 8px; }
+
+        .menu-photos-note { font: 14px Arial, sans-serif; color: #111; margin: 0 0 8px; }
+        .menu-photos-note p { font: inherit; }
+        body { background: #ddd; padding: 16px; }
+        .poster-frame { margin-bottom: 20px; }
+        .poster-frame + .poster-frame { margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <main class="menu-photos-page">
+        <div class="poster-frame">
+            <section class="poster sig" data-poster="Signature Pizzas">
+                <div class="top-border"></div>
+                <div class="page">
+                    <h1>Signature Pizzas</h1>
+                    <div class="cols">
+                        <div class="item"><h3>All Meat</h3><p>Pepperoni, Sausage, Italian Sausage, Beef, &amp; Ham</p></div>
+                        <div class="item"><h3>Veggie</h3><p>Green Peppers, Onions, Mushrooms, Black Olives, Banana Peppers, Tomatoes, &amp; Spinach</p></div>
+                        <div class="item"><h3>Around the World</h3><p>Pepperoni, Sausage, Italian Sausage, Beef, Ham, Green Peppers, Onions, Mushrooms, Black Olives, &amp; Banana Peppers</p></div>
+                        <div class="item"><h3>Bar-Q Chicken</h3><p>Chicken, Banana Peppers, Onions, &amp; BBQ Sauce</p></div>
+                        <div class="item center"><h3>Chicken Supreme</h3><p>Chicken, Green Peppers, Onions, Mushrooms, Black Olives, &amp; Banana Peppers</p></div>
+                    </div>
+                    <div class="rule"></div>
+                    <h2>Create Your Own</h2>
+                    <p class="toppings">Cheese, Pepperoni, Sausage, Italian Sausage, Beef, Ham, Bacon, Chicken, Green Peppers, Onions, Mushrooms, Black Olives, Banana Peppers, Jalapeño Peppers, Tomatoes, Spinach, Pineapple, Tofu</p>
+                    <div class="grid">
+                        <div class="row head"><p>Topping</p><p>7" (4 slices)</p><p>10" (8 slices)</p><p>16" (16 slices)</p></div>
+                        <div class="row"><p>Cheese</p><p>$5.50</p><p>$12.00</p><p>$15.00</p></div>
+                        <div class="row"><p>1</p><p>$6.00</p><p>$13.00</p><p>$20.00</p></div>
+                        <div class="row"><p>2</p><p>$7.00</p><p>$15.00</p><p>$25.00</p></div>
+                        <div class="row"><p>3</p><p>$8.00</p><p>$17.00</p><p>$30.00</p></div>
+                        <div class="row"><p>4 or more</p><p>$9.00</p><p>$19.00</p><p>$35.00</p></div>
+                        <div class="row"><p>Signature</p><p>$10.00</p><p>$20.00</p><p>$35.00</p></div>
+                        <div class="row"><p>Veggie</p><p>$9.00</p><p>$18.00</p><p>$26.00</p></div>
+                        <div class="row"><p>Add’l Topping</p><p>$1.00</p><p>$2.00</p><p>$3.00</p></div>
+                    </div>
+                    <p class="note">10" Gluten Free / Vegan $4 or Cauliflower Crust additional $5</p>
+                </div>
+            </section>
+        </div>
+
+        <div class="poster-frame">
+            <section class="poster lunch" data-poster="Lunch Special">
+                <div class="top-border"></div>
+                <div class="page">
+                    <h1>Lunch Specials</h1>
+                    <p class="hours">11am – 2pm</p>
+                    <div class="rule"></div>
+                    <div class="cols">
+                        <div>
+                            <div class="item"><div class="row"><h3>6-Stuffed Breadsticks</h3><p class="price">$14.00</p></div><p>Up to 2 toppings and a drink</p></div>
+                            <div class="item"><div class="row"><h3>Personal Pizza w/Breadsticks</h3><p class="price">$13.00</p></div><p>Pizza, plain breadsticks, and a drink. Lunch special only.</p></div>
+                            <div class="item"><div class="row"><h3>Personal Pizza w/Chips</h3><p class="price">$11.00</p></div><p>7-inch personal pizza with chips</p></div>
+                        </div>
+                        <div>
+                            <div class="item"><div class="row"><h3>Sandwich Of Your Choice</h3><p class="price">$11.00</p></div><p>Sandwich, chips, and a drink</p></div>
+                            <div class="item"><div class="row"><h3>10 Inch Lunch Special w/Breadsticks</h3><p class="price">$20.00</p></div><p>10-inch lunch special with breadsticks</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="poster-frame">
+            <section class="poster sand" data-poster="Sandwiches">
+                <div class="top-border"></div>
+                <div class="page">
+                    <h1>Sandwiches</h1>
+                    <div class="cols">
+                        <div>
+                            <div class="item"><div class="row"><h3>Hoagie</h3><p class="price">$9.00</p></div><p>Beef patty, onions, mushrooms, green pepper, cheese, and pizza sauce</p></div>
+                            <div class="item"><div class="row"><h3>Hot Ham And Cheese</h3><p class="price">$8.00</p></div><p>Ham, mozzarella cheese blend, and pizza sauce</p></div>
+                            <div class="item"><div class="row"><h3>Butler Special</h3><p class="price">$12.00</p></div><p>Sausage, pepperoni, ham, beef patty, mushrooms, onions, green peppers, banana peppers, olives, pizza sauce, and cheese</p></div>
+                            <div class="item"><div class="row"><h3>Veggie Strom</h3><p class="price">$6.50</p></div></div>
+                        </div>
+                        <div>
+                            <div class="item"><div class="row"><h3>Regular Strom</h3><p class="price">$9.00</p></div><p>Sausage, pepperoni, onions, mushrooms, green peppers, cheese, and pizza sauce</p></div>
+                            <div class="item"><div class="row"><h3>Chicken Strom</h3><p class="price">$11.00</p></div><p>Chicken, mushrooms, onions, green peppers, banana peppers, cheese, and pizza sauce</p></div>
+                            <div class="item"><div class="row"><h3>Super Strom</h3><p class="price">$10.00</p></div><p>Sausage, pepperoni, ham, onions, mushrooms, black olives, banana peppers, green peppers, pizza sauce, and cheese</p></div>
+                        </div>
+                    </div>
+                    <div class="rule"></div>
+                    <div class="lower">
+                        <div>
+                            <h2>Drinks</h2>
+                            <div class="line"><p>Fountain Drink</p><p>$3.00</p></div>
+                            <div class="line"><p>Bottled Drinks</p><p>$2.25</p></div>
+                            <div class="line"><p>Bottled Water</p><p>$2.25</p></div>
+                            <div class="line"><p>Can Pop</p><p>$1.25</p></div>
+                        </div>
+                        <div>
+                            <h2>Appetizers</h2>
+                            <div class="line"><p>Breadsticks</p><p>3 ct. $3.00 · 6 ct. $5.00</p></div>
+                            <div class="line"><p>Stuffed Breadsticks</p><p>3 ct. $7.50 · 6 ct. $15.00</p></div>
+                            <div class="line"><p>Grippo Chips</p><p>$1.75</p></div>
+                            <div class="line"><p>Plain Chips</p><p>$1.00</p></div>
+                            <div class="line"><p>Dipping Sauce Cups</p><p>$0.92</p></div>
+                            <p class="sauces">Sauces: Ranch, Cheese, Marinara, Garlic Butter</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script>
+        if (sessionStorage.getItem("butlersPizzaLocalDemoSessionV1") !== "active" && window.top === window.self) {
+            location.replace("admin.html");
+        }
+    </script>
+    <script src="menu-photos-font.js"></script>
+    <script src="admin-content.js"></script>
+    <script>
+        (() => {
+            const fontStyle = document.createElement("style");
+            fontStyle.textContent = window.MENU_PHOTO_FONT;
+            document.head.append(fontStyle);
+            const fit = () => {
+                const scale = Math.min(1, (document.documentElement.clientWidth - 32) / 1365);
+                document.querySelectorAll(".poster-frame").forEach((frame) => {
+                    frame.style.height = `${768 * scale}px`;
+                    frame.querySelector(".poster").style.transform = `scale(${scale})`;
+                    frame.querySelector(".poster").style.transformOrigin = "top left";
+                });
+            };
+            fit();
+            window.addEventListener("resize", fit);
+        })();
+    </script>
+</body>
+</html>
