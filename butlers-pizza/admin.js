@@ -451,6 +451,23 @@
 
     const posterToBlob = (poster) => new Promise((resolve, reject) => {
         const clone = poster.cloneNode(true);
+            const sourceImages = Array.from(poster.querySelectorAll("img"));
+            // Images inside an SVG render must be embedded, so convert each one to a data URL.
+            clone.querySelectorAll("img").forEach((img, index) => {
+                const source = sourceImages[index];
+                if (!source?.naturalWidth) {
+                    return;
+                }
+                try {
+                    const copy = document.createElement("canvas");
+                    copy.width = source.naturalWidth;
+                    copy.height = source.naturalHeight;
+                    copy.getContext("2d").drawImage(source, 0, 0);
+                    img.setAttribute("src", copy.toDataURL("image/jpeg", 0.92));
+                } catch (error) {
+                    console.error("Could not embed picture.", error);
+                }
+            });
         clone.querySelectorAll(".admin-control").forEach((node) => node.remove());
         [clone, ...clone.querySelectorAll("*")].forEach((node) => {
             node.classList.remove("admin-edit-selected", "admin-has-controls");
@@ -587,7 +604,7 @@
         imageFile.value = "";
         imageUrl.value = "";
         imageAlt.value = field.node.alt || "";
-        const croppable = Boolean(group || field.node.closest(".about-team-photo"));
+        const croppable = Boolean(group || field.node.closest(".about-team-photo, .poster-art"));
         cropTools.hidden = !croppable;
         if (croppable) {
             const doc = field.node.ownerDocument;

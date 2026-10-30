@@ -6,6 +6,13 @@
     <meta name="robots" content="noindex">
     <title>Menu Pictures | Butler's Pizza Admin</title>
     <link rel="icon" type="image/png" href="assets/bplogo.png">
+    <link rel="stylesheet" href="styles.css">
+    <style id="page-style">
+        body { display: block; background: #121212; }
+        .menu-photos-page { background: #ddd; padding: 16px; }
+        .poster-frame { margin-bottom: 20px; }
+        .site-header { position: relative; }
+    </style>
     <style id="poster-style">
         * { box-sizing: border-box; margin: 0; padding: 0; }
         .poster {
@@ -23,6 +30,7 @@
         .poster .top-border { position: absolute; top: 0; left: 0; right: 0; height: 18px; background: #d13014; }
         .poster .page { position: absolute; top: 18px; left: 0; right: 0; bottom: 0; padding: 14px 70px 0; }
         .poster h1, .poster h2 { font-family: "Kaushan Script", cursive; font-weight: 400; color: #d13014; text-align: center; letter-spacing: 1px; }
+        .poster h3 { font-family: Arial, Helvetica, sans-serif; }
         .poster h1 { font-size: 56px; line-height: 1.1; }
         .poster h2 { font-size: 44px; line-height: 1.1; }
         .poster .rule { height: 0; border-top: 5px solid #111; border-bottom: 2px solid #111; padding-top: 3px; }
@@ -30,20 +38,23 @@
         .poster .price, .poster h3 { font-weight: 900; }
         .poster .price { white-space: nowrap; }
 
-        .sig .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 50px; margin-top: 8px; }
-        .sig .item { margin-bottom: 6px; }
-        .sig .item h3 { font-size: 21px; text-transform: uppercase; letter-spacing: 1px; }
-        .sig .item p { font-size: 16.5px; line-height: 1.3; font-weight: 600; margin-top: 2px; }
+        .sig .page { padding-top: 6px; }
+        .sig h1 { font-size: 50px; }
+        .sig h2 { font-size: 40px; }
+        .sig .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 50px; margin-top: 4px; }
+        .sig .item { margin-bottom: 4px; }
+        .sig .item h3 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .sig .item p { font-size: 16px; line-height: 1.28; font-weight: 600; margin-top: 1px; }
         .sig .center { text-align: center; grid-column: 1 / -1; }
-        .sig .rule { margin: 8px 0 4px; }
-        .sig .toppings { text-align: center; font-size: 18px; line-height: 1.35; font-weight: 700; margin: 4px 0 6px; }
+        .sig .rule { margin: 6px 0 2px; }
+        .sig .toppings { text-align: center; font-size: 17px; line-height: 1.3; font-weight: 700; margin: 2px 0 6px; }
         .sig .grid { width: 760px; margin: 0 auto; }
         .sig .grid .row { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 0; border-bottom: 1px solid rgb(17 17 17 / 25%); }
-        .sig .grid .row p { font-size: 19px; font-weight: 800; text-align: center; padding: 1px 10px; }
+        .sig .grid .row p { font-size: 18px; font-weight: 800; text-align: center; padding: 1px 10px; }
         .sig .grid .row p:first-child { text-align: left; }
         .sig .grid .head { border-bottom: 3px solid #111; }
         .sig .grid .head p { font-weight: 900; }
-        .sig .note { text-align: center; font-size: 20px; font-weight: 900; margin-top: 8px; }
+        .sig .note { text-align: center; font-size: 20px; font-weight: 900; margin-top: 12px; }
 
         .lunch .page { padding-top: 22px; }
         .lunch .sub { text-align: center; font-size: 22px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; margin-top: 6px; }
@@ -55,28 +66,42 @@
         .lunch .item .price { font-size: 25px; line-height: normal; margin-top: 0; font-weight: 900; }
         .lunch .item p { font-size: 20px; line-height: 1.35; font-weight: 600; margin-top: 5px; }
 
-        .sand .page { padding: 10px 60px 0; }
-        .sand .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; margin-top: 8px; }
-        .sand .item { margin-bottom: 10px; }
-        .sand .item h3 { font-size: 21px; text-transform: uppercase; }
-        .sand .item .price { font-size: 21px; line-height: normal; margin-top: 0; font-weight: 900; }
-        .sand .item p { font-size: 15.5px; line-height: 1.28; font-weight: 600; margin-top: 2px; }
-        .sand .rule { margin: 6px 0 2px; }
-        .sand .lower { display: grid; grid-template-columns: 1fr 1.25fr; gap: 0 56px; }
-        .sand h2 { font-size: 40px; margin-bottom: 4px; }
-        .sand .line { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgb(17 17 17 / 25%); padding: 3px 0; }
-        .sand .line p { font-size: 18.5px; font-weight: 800; }
+        .sand .page { padding: 14px 60px 0; }
+        .sand h1 { font-size: 60px; }
+        .sand .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; margin-top: 12px; }
+        .sand .item { margin-bottom: 18px; }
+        .sand .item h3 { font-size: 24px; text-transform: uppercase; }
+        .sand .item .price { font-size: 24px; line-height: normal; margin-top: 0; font-weight: 900; }
+        .sand .item p { font-size: 17.5px; line-height: 1.3; font-weight: 600; margin-top: 3px; }
+        .sand .rule { margin: 10px 0 6px; }
+        .sand .lower { display: grid; grid-template-columns: 0.95fr 1.5fr 0.95fr; gap: 0 40px; }
+        .sand h2 { font-size: 46px; margin-bottom: 6px; }
+        .sand .line { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgb(17 17 17 / 25%); padding: 5px 0; }
+        .sand .line p { font-size: 20px; font-weight: 800; }
         .sand .line p:last-child { font-weight: 900; white-space: nowrap; }
         .sand .sauces { font-size: 17px; font-weight: 800; margin-top: 8px; }
 
-        .menu-photos-note { font: 14px Arial, sans-serif; color: #111; margin: 0 0 8px; }
-        .menu-photos-note p { font: inherit; }
-        body { background: #ddd; padding: 16px; }
-        .poster-frame { margin-bottom: 20px; }
-        .poster-frame + .poster-frame { margin-top: 4px; }
+        .poster-art { position: absolute; top: 18px; left: 0; right: 0; bottom: 0; overflow: hidden; background: #f4ab2e; }
+        .poster-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .poster-art .tint { position: absolute; inset: 0; background: rgba(244, 171, 46, 0.84); pointer-events: none; }
     </style>
 </head>
 <body>
+    <header class="site-header">
+        <div class="brand-logo">
+            <span class="logo-top">BUTLER'S</span>
+            <span class="logo-bottom">PIZZA</span>
+        </div>
+        <nav class="nav-links">
+            <a href="menu.html">MENU</a>
+            <a href="specials.html">SPECIALS</a>
+            <a href="about.html">ABOUT / MEDIA</a>
+            <a href="catering.html">CATERING</a>
+            <a href="faq.html">FAQ's</a>
+            <a class="admin-nav-tab" href="menu-photos.html" aria-current="page">MENU PICTURES</a>
+        </nav>
+        <a href="#order" class="order-btn">ORDER</a>
+    </header>
     <main class="menu-photos-page">
         <div class="poster-frame">
             <section class="poster sig" data-poster="Signature Pizzas">
@@ -164,10 +189,25 @@
                             <div class="line"><p>Stuffed Breadsticks</p><p>3 ct. $7.50 · 6 ct. $15.00</p></div>
                             <div class="line"><p>Grippo Chips</p><p>$1.75</p></div>
                             <div class="line"><p>Plain Chips</p><p>$1.00</p></div>
-                            <div class="line"><p>Dipping Sauce Cups</p><p>$0.92</p></div>
-                            <p class="sauces">Sauces: Ranch, Cheese, Marinara, Garlic Butter</p>
+                        </div>
+                        <div>
+                            <h2>Sauces</h2>
+                            <div class="line"><p>Ranch Cup</p><p>$0.92</p></div>
+                            <div class="line"><p>Cheese Cup</p><p>$0.92</p></div>
+                            <div class="line"><p>Marinara Cup</p><p>$0.92</p></div>
+                            <div class="line"><p>Garlic Butter</p><p>$0.92</p></div>
                         </div>
                     </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="poster-frame">
+            <section class="poster logo" data-poster="Logo">
+                <div class="top-border"></div>
+                <div class="poster-art">
+                    <img src="assets/butlers-brick-wall.jpg" alt="Butler's Pizza graffiti logo">
+                    <div class="tint"></div>
                 </div>
             </section>
         </div>

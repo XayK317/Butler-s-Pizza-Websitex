@@ -364,7 +364,7 @@
                 if (typeof changes.alt === "string") {
                     node.setAttribute("alt", changes.alt);
                 }
-                if (node.closest(".about-team-photo") && changes.zoom !== undefined) {
+                if (node.closest(".about-team-photo, .poster-art") && changes.zoom !== undefined) {
                     applyCrop(node, changes);
                 }
             } else if (kind === "link") {
