@@ -381,6 +381,10 @@
             const addWrap = doc.createElement("div");
             addWrap.className = "admin-control admin-poster-add-wrap";
             addWrap.innerHTML = '<button type="button" class="admin-control admin-add-item admin-poster-add">+ Add row</button>';
+            if (group.node.matches(".faq-list")) {
+                addWrap.firstElementChild.textContent = "+ Add FAQ";
+                items.forEach((item) => { item.open = true; });
+            }
             group.node.append(addWrap);
         });
         pageApi.getManagedGroups(doc).forEach((group) => {
@@ -635,7 +639,7 @@
         let content;
         try {
             content = contentApi.readOverrides();
-            const pageContent = currentPageContent(content, pageKey);
+            const pageContent = currentPageContent(content, fieldId.startsWith("footer-") ? "__footer__" : pageKey);
             pageContent.fields[fieldId] = {
                 ...pageContent.fields[fieldId],
                 ...updates
@@ -790,7 +794,8 @@
         if (!doc.querySelector("#admin-preview-style")) {
             const style = doc.createElement("style");
             style.id = "admin-preview-style";
-            style.textContent = ".admin-edit-selected{outline:none!important;cursor:text}.admin-edit-selected img{outline:3px solid #d13014!important;outline-offset:3px}"
+            style.textContent = ".section-divider-logo,.section-divider-logo-shadow{pointer-events:none!important}"
+                + ".admin-edit-selected{outline:none!important;cursor:text}.admin-edit-selected img{outline:3px solid #d13014!important;outline-offset:3px}"
                 + ".admin-has-controls{position:relative}"
                 + ".admin-control{font:700 14px/1 sans-serif;cursor:pointer}"
                 + ".admin-delete-item{position:absolute;top:-8px;right:-8px;z-index:5;width:26px;height:26px;padding:0;border:2px solid #fff;border-radius:50%;background:#d13014;color:#fff;font-size:18px}"
@@ -891,11 +896,35 @@
                     return;
                 }
             }
-            const textNode = target.closest("main h1, main h2, main h3, main h4, main p, footer h2, footer h4, footer p");
+            const summaryNode = target.closest("summary");
+            if (summaryNode && summaryNode.closest(".faq-list")) {
+                event.preventDefault();
+            }
+            const textNode = target.closest("main h1, main h2, main h3, main h4, main p, main summary, footer h2, footer h4, footer p");
+            if (textNode && textNode.dataset.adminEditing === "true") {
+                if (target.closest("a")) {
+                    event.preventDefault();
+                }
+                return;
+            }
             if (textNode && !textNode.closest(".menu-item")) {
                 const field = pageApi.getEditableFields(doc).find((candidate) => candidate.kind === "text" && candidate.node === textNode);
                 if (!field) {
                     return;
+                }
+                let caret = null;
+                try {
+                    if (doc.caretPositionFromPoint) {
+                        const position = doc.caretPositionFromPoint(event.clientX, event.clientY);
+                        if (position) {
+                            caret = doc.createRange();
+                            caret.setStart(position.offsetNode, position.offset);
+                        }
+                    } else if (doc.caretRangeFromPoint) {
+                        caret = doc.caretRangeFromPoint(event.clientX, event.clientY);
+                    }
+                } catch (error) {
+                    caret = null;
                 }
                 hideSelectedOutline();
                 activeSelection = { type: "text", node: textNode, field, pageKey };
@@ -910,8 +939,28 @@
                 linkTools.hidden = true;
                 itemTools.hidden = true;
                 textNode.focus();
+                if (caret && textNode.contains(caret.startContainer)) {
+                    caret.collapse(true);
+                    const selection = doc.defaultView.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(caret);
+                }
+                event.preventDefault();
             } else if (activeSelection) {
                 resetSelection();
+            }
+        }, true);
+
+        doc.addEventListener("keydown", (event) => {
+            const target = event.target;
+            if (target?.nodeType === 1 && target.tagName === "SUMMARY" && target.dataset.adminEditing === "true") {
+                if (event.key === " ") {
+                    event.preventDefault();
+                    doc.execCommand("insertText", false, " ");
+                } else if (event.key === "Enter") {
+                    event.preventDefault();
+                    target.blur();
+                }
             }
         }, true);
 
@@ -928,7 +977,9 @@
                 const field = pageApi.getEditableFields(doc).find((candidate) => candidate.node === target);
                 if (field) {
                     const value = target.innerText.replace(/\u00a0/g, " ").trim();
-                    pageApi.setPlainText(target, value);
+                    if (!target.querySelector(":scope > :not(br)")) {
+                        pageApi.setPlainText(target, value);
+                    }
                     if (field.posterGroup) {
                         savePosterRows(field.posterGroup, pageKey, pageApi);
                     } else {
@@ -977,7 +1028,24 @@
         const pageName = pageSelect.value;
         document.querySelector("#open-page-link").href = pageName;
         preview.src = `${pageName}?admin-preview=${Date.now()}`;
+        // The map embed can delay the iframe load event indefinitely, so attach once the DOM is ready.
+        const token = ++loadSelectedPage.token;
+        const waitForDom = () => {
+            if (token !== loadSelectedPage.token) {
+                return;
+            }
+            const doc = preview.contentDocument;
+            const ready = doc && doc.readyState !== "loading" && doc.location.pathname.endsWith(pageName)
+                && doc.querySelector("main") && preview.contentWindow.ButlersAdminContent;
+            if (ready) {
+                renderEditor();
+            } else {
+                setTimeout(waitForDom, 100);
+            }
+        };
+        setTimeout(waitForDom, 100);
     };
+    loadSelectedPage.token = 0;
 
     const initEditor = () => {
         pageSelect.addEventListener("change", loadSelectedPage);
@@ -989,7 +1057,29 @@
                 setDownloadsEnabled(true);
             }
         }).observe(selectionMessage, { childList: true, characterData: true, subtree: true });
-        preview.addEventListener("load", renderEditor);
+        preview.addEventListener("load", () => {
+            if (!preview.contentDocument?.adminEditorAttached) {
+                renderEditor();
+            }
+        });
+        // Navigating through the preview's own links can leave the load event pending (map embed), so poll for new pages.
+        setInterval(() => {
+            try {
+                const doc = preview.contentDocument;
+                if (!doc || doc.adminEditorAttached || doc.readyState === "loading" || !doc.querySelector("main")
+                    || !preview.contentWindow.ButlersAdminContent || doc.location.href === "about:blank") {
+                    return;
+                }
+                const name = doc.location.pathname.substring(doc.location.pathname.lastIndexOf("/") + 1) || "index.html";
+                if (Array.from(pageSelect.options).some((option) => option.value === name)) {
+                    pageSelect.value = name;
+                    document.querySelector("#open-page-link").href = name;
+                }
+                renderEditor();
+            } catch (error) {
+                // Preview is mid-navigation.
+            }
+        }, 300);
         imageFile.addEventListener("change", () => readImageFile(imageFile.files?.[0]));
         imageDropZone.addEventListener("dragover", (event) => {
             event.preventDefault();

@@ -1,8 +1,15 @@
 {
   "scripts": {
-    "build:css": "sass --no-source-map --style=expanded butlers-pizza"
+    "build:css": "sass --no-source-map --style=expanded butlers-pizza",
+    "start": "node server.js"
   },
   "devDependencies": {
     "sass": "^1.106.1"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "express": "^5.3.0",
+    "nodemailer": "^10.3.1",
+    "stripe": "^23.1.0"
   }
 }

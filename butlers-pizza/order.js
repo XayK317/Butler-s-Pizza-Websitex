@@ -367,7 +367,35 @@
     return '';
   }
 
-  $('checkout-form').addEventListener('submit', (e) => {
+  let apiOn = false;
+  let cardOn = false;
+  const cardLabel = document.querySelector('input[name="payment"][value="card"]').closest('label');
+  cardLabel.hidden = true;
+  fetch('/api/config').then((r) => (r.ok ? r.json() : null)).then((c) => {
+    if (!c || !c.api) return;
+    apiOn = true;
+    cardOn = !!c.cardEnabled;
+    cardLabel.hidden = !cardOn;
+  }).catch(() => {});
+
+  document.querySelectorAll('input[name="payment"]').forEach((r) => r.addEventListener('change', () => {
+    const card = $('checkout-form').payment.value === 'card';
+    $('card-note').hidden = !card;
+    $('place-order').textContent = card ? 'Place order & continue to payment' : 'Place order';
+  }));
+
+  function finishOrder(order) {
+    showConfirmation(order);
+    cart = [];
+    save(CART_KEY, cart);
+    const f = $('checkout-form');
+    f.reset();
+    f.hidden = true;
+    $('card-note').hidden = true;
+    $('place-order').textContent = 'Place order';
+  }
+
+  $('checkout-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = e.target;
     const err = $('form-error');
@@ -379,29 +407,59 @@
     if (!name) return fail('Please enter your name.');
     if (phone.replace(/\D/g, '').length < 10) return fail('Please enter a valid phone number.');
     if (email && !/^\S+@\S+\.\S+$/.test(email)) return fail('Please enter a valid email or leave it blank.');
+    const payment = f.payment.value;
+    if (payment === 'card' && !cardOn) return fail('Online card payment is not available yet. Please choose Pay at the counter.');
     const problem = stale();
     if (problem) { fail(problem); openWhenDialog(); return; }
     err.hidden = true;
 
     const pickup = pickupDate();
-    const orders = load(ORDERS_KEY, []);
-    const number = 'BP-' + String(orders.length + 1).padStart(4, '0');
-    const order = {
-      number, name, phone, email,
-      coupon: f.coupon.value, notes: f.notes.value.trim(),
+    const payload = {
+      name, phone, email,
+      coupon: f.coupon.value, notes: f.notes.value.trim(), payment,
       pickup: pickup.toISOString(), asap: when.mode === 'now',
-      lines: cart.map((l) => ({ name: l.name, qty: l.qty, price: l.price, note: l.note })),
+      lines: cart.map((l) => ({ name: l.name, qty: l.qty, price: l.price, note: l.note }))
+    };
+
+    if (apiOn) {
+      const btn = $('place-order');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/order', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) return fail(data.error || 'Could not place the order.');
+        if (data.url) { window.location.href = data.url; return; }
+        finishOrder(data.order);
+      } catch (x) {
+        fail('Could not reach the restaurant. Please check your connection or call us.');
+      } finally {
+        btn.disabled = false;
+      }
+      return;
+    }
+
+    const orders = load(ORDERS_KEY, []);
+    const order = {
+      ...payload,
+      number: 'BP-' + String(orders.length + 1).padStart(4, '0'),
       subtotal: cart.reduce((s, l) => s + l.price * l.qty, 0),
       placedAt: new Date().toISOString()
     };
     orders.push(order);
     save(ORDERS_KEY, orders);
-    showConfirmation(order);
-    cart = [];
-    save(CART_KEY, cart);
-    f.reset();
-    f.hidden = true;
+    finishOrder(order);
   });
+
+  const paidSession = new URLSearchParams(location.search).get('session_id');
+  if (paidSession) {
+    fetch('/api/order-status?session_id=' + encodeURIComponent(paidSession))
+      .then((r) => r.json().then((d) => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (ok) { history.replaceState(null, '', 'order.html'); finishOrder(d.order); }
+      }).catch(() => {});
+  }
 
   function orderText(o) {
     const lines = o.lines.map((l) => l.qty + ' x ' + l.name + ' - ' + money(l.price * l.qty) + (l.note ? ' (' + l.note + ')' : ''));
@@ -424,7 +482,7 @@
     $('confirm-name').textContent = o.name;
     $('confirm-number').textContent = o.number;
     $('confirm-when').textContent = o.asap ? 'ASAP (about 20–30 minutes)' : whenText(o);
-    $('confirm-total').textContent = money(o.subtotal);
+    $('confirm-total').textContent = money(o.total != null ? o.total : o.subtotal);
     const ul = $('confirm-lines');
     ul.textContent = '';
     o.lines.forEach((l) => {
@@ -440,9 +498,12 @@
     });
     $('confirm-email').href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent('Pickup order ' + o.number) +
       '&body=' + encodeURIComponent(orderText(o));
+    const paid = o.payment === 'card';
+    $('confirm-pay-note').textContent = (paid ? 'Paid online — thank you! ' : 'Pay at the counter when you pick up. ') +
+      'Questions? Call 317-600-5463 or 317-600-8793.';
     document.querySelector('.order-layout').hidden = true;
     document.querySelector('.when-bar').hidden = true;
-    const c = $('order-confirm');
+    const c =  $('order-confirm');
     c.hidden = false;
     c.focus();
     c.scrollIntoView({ block: 'start' });

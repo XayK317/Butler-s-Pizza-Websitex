@@ -10,20 +10,7 @@
 </head>
 <body>
     <div class="page-container">
-        <header class="site-header">
-            <a class="brand-logo" href="index.html" aria-label="Butler's Pizza home">
-                <span class="logo-top">BUTLER'S</span>
-                <span class="logo-bottom">PIZZA</span>
-            </a>
-            <nav class="nav-links" aria-label="Main navigation">
-                <a href="menu.html">MENU</a>
-                <a href="specials.html">SPECIALS</a>
-                <a href="about.html">ABOUT / MEDIA</a>
-                <a href="catering.html">CATERING</a>
-                <a href="faq.html">FAQ's</a>
-            </nav>
-            <a href="order.html" class="order-btn" aria-current="page">ORDER</a>
-        </header>
+        <!--include:header-->
 
         <main class="order-page">
             <h1 class="order-title">ORDER ONLINE</h1>
@@ -51,7 +38,7 @@
                     <div class="cart-total" id="cart-total" hidden>
                         <span>Subtotal</span><strong id="cart-subtotal">$0.00</strong>
                     </div>
-                    <p class="cart-note" id="cart-note" hidden>Sales tax is added when you pick up. Pay at the counter.</p>
+                    <p class="cart-note" id="cart-note" hidden>Sales tax is added at pickup or payment. Choose how to pay at checkout.</p>
 
                     <form id="checkout-form" class="checkout-form" hidden novalidate>
                         <h3>Pickup details</h3>
@@ -62,8 +49,14 @@
                             <select name="coupon" id="coupon-select"><option value="">None</option></select>
                         </label>
                         <label>Order notes (optional)<textarea name="notes" rows="2" maxlength="300"></textarea></label>
+                        <fieldset class="pay-options">
+                            <legend>Payment</legend>
+                            <label><input type="radio" name="payment" value="counter" checked> Pay at the counter</label>
+                            <label><input type="radio" name="payment" value="card"> Pay by card online</label>
+                            <p class="cart-note" id="card-note" hidden>After you place your order, you'll go to a secure payment page to enter your card. We never see or store your card number.</p>
+                        </fieldset>
                         <p class="form-error" id="form-error" role="alert" hidden></p>
-                        <button type="submit" class="order-primary">Place order</button>
+                        <button type="submit" class="order-primary" id="place-order">Place order</button>
                     </form>
                     <button type="button" class="order-primary" id="start-checkout" hidden>Checkout</button>
                 </aside>
@@ -74,7 +67,7 @@
                 <p>Your order <strong id="confirm-number"></strong> is placed for pickup <strong id="confirm-when"></strong>.</p>
                 <ul id="confirm-lines" class="cart-lines"></ul>
                 <p class="cart-total"><span>Subtotal</span><strong id="confirm-total"></strong></p>
-                <p class="cart-note">Pay at the counter when you pick up. Questions? Call 317-600-5463 or 317-600-8793.</p>
+                <p class="cart-note" id="confirm-pay-note">Pay at the counter when you pick up. Questions? Call 317-600-5463 or 317-600-8793.</p>
                 <div class="confirm-actions">
                     <a class="order-primary" id="confirm-email" href="#">Email this order to the restaurant</a>
                     <button type="button" class="order-secondary" id="new-order">Start a new order</button>
@@ -99,23 +92,10 @@
             </form>
         </dialog>
 
-        <footer class="site-footer" id="visit">
-            <div class="footer-content-wrapper">
-                <div class="footer-info">
-                    <h2 class="footer-section-title">VISIT US</h2>
-                    <div class="footer-block">
-                        <h4>BUTLER'S PIZZA</h4>
-                        <p>1220 WATERWAY BLVD, INDIANAPOLIS, INDIANA 46202, UNITED STATES</p>
-                        <p class="phone-number">317-500-5463 OR 317-600-8793</p>
-                    </div>
-                    <div class="footer-block">
-                        <h4>HOURS</h4>
-                        <p>Mon–Sun: 11:00 am–8:00 pm<br>Holiday hours may vary</p>
-                    </div>
-                </div>
-            </div>
-        </footer>
+        <!--include:footer-->
     </div>
+    <script src="admin-content.js"></script>
+    <script src="script.js"></script>
     <script src="order.js"></script>
 </body>
 </html>

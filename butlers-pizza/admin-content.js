@@ -17,7 +17,8 @@
             [".lunch .cols > div", ":scope > .item"],
             [".sand .cols > div", ":scope > .item"],
             [".sig .grid", ":scope > .row:not(.head)"],
-            [".sand .lower > div", ":scope > .line"]
+            [".sand .lower > div", ":scope > .line"],
+            [".faq-list", ":scope > details"]
         ];
         const groups = [];
         specs.forEach(([selector, itemSelector]) => {
@@ -30,6 +31,7 @@
 
     const readPosterRow = (item) => {
         const clone = item.cloneNode(true);
+        clone.removeAttribute("open");
         clone.querySelectorAll(".admin-control").forEach((control) => control.remove());
         [clone, ...clone.querySelectorAll("*")].forEach((node) => {
             node.classList.remove("admin-edit-selected", "admin-has-controls");
@@ -48,7 +50,7 @@
         template.content.querySelectorAll("script, iframe, object, embed, link, style").forEach((node) => node.remove());
         template.content.querySelectorAll("*").forEach((node) => {
             Array.from(node.attributes).forEach((attribute) => {
-                if (/^on/i.test(attribute.name)) {
+                if (/^on/i.test(attribute.name) || (attribute.name === "href" && /^\s*javascript:/i.test(attribute.value))) {
                     node.removeAttribute(attribute.name);
                 }
             });
@@ -58,6 +60,14 @@
 
     const createPosterRow = (doc, group) => {
         const items = Array.from(group.node.querySelectorAll(group.itemSelector));
+        if (group.node.matches(".faq-list")) {
+            const faq = parsePosterRow(doc, readPosterRow(items[0]));
+            faq.querySelector("summary").textContent = "New question?";
+            const answers = Array.from(faq.querySelectorAll("p"));
+            answers.slice(1).forEach((node) => node.remove());
+            setPlainText(answers[0], "Type the answer here.");
+            return faq;
+        }
         const template = items.reduce((best, item) => (
             item.querySelectorAll("p, h3").length >= best.querySelectorAll("p, h3").length ? item : best
         ), items[0]);
@@ -76,7 +86,7 @@
 
     const getEditableFields = (doc = document) => {
         const fieldNodes = Array.from(doc.querySelectorAll(
-            "main h1, main h2, main h3, main h4, main p, footer h2, footer h4, footer p, .media-cta, .amp-link, .map-directions"
+            "main h1, main h2, main h3, main h4, main p, main summary, footer h2, footer h4, footer p, .media-cta, .amp-link, .map-directions"
         )).filter((node) => !node.closest(".menu-item"));
         const tagIndexes = new Map();
         const posterGroups = getPosterGroups(doc);
@@ -98,10 +108,12 @@
                     label: `${tagName.toUpperCase()}: ${node.textContent.trim().slice(0, 60)}`
                 };
             }
-            const index = tagIndexes.get(tagName) || 0;
-            tagIndexes.set(tagName, index + 1);
+            const inFooter = Boolean(node.closest("footer"));
+            const counterKey = inFooter ? `footer-${tagName}` : tagName;
+            const index = tagIndexes.get(counterKey) || 0;
+            tagIndexes.set(counterKey, index + 1);
             return {
-                id: `text-${tagName}-${index}`,
+                id: inFooter ? `footer-text-${tagName}-${index}` : `text-${tagName}-${index}`,
                 kind: "text",
                 node,
                 label: `${tagName.toUpperCase()} ${index + 1}: ${node.textContent.trim().slice(0, 60)}`
@@ -141,9 +153,13 @@
             });
         });
 
-        Array.from(doc.querySelectorAll(".media-cta, .footer-interactive a")).forEach((node, index) => {
+        let footerLinkIndex = 0;
+        let mainLinkIndex = 0;
+        Array.from(doc.querySelectorAll(".media-cta, .footer-interactive a")).forEach((node) => {
+            const inFooter = Boolean(node.closest("footer"));
+            const index = inFooter ? footerLinkIndex++ : mainLinkIndex++;
             fields.push({
-                id: `link-${index}`,
+                id: inFooter ? `footer-link-${index}` : `link-${index}`,
                 kind: "link",
                 node,
                 label: `Link ${index + 1}: ${node.getAttribute("aria-label") || node.textContent.trim().slice(0, 50)}`
@@ -486,7 +502,7 @@
         });
 
         getEditableFields(doc).forEach(({ id, kind, node, posterGroup }) => {
-            const changes = pageContent.fields?.[id];
+            const changes = id.startsWith("footer-") ? content.__footer__?.fields?.[id] : pageContent.fields?.[id];
             if (!changes || posterGroup) {
                 return;
             }

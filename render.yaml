@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: butlers-pizza
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: ORDER_EMAIL
+        value: 3dbutlerpizza@att.net
+      - key: TAX_RATE
+        value: "0.07"
