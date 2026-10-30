@@ -247,8 +247,8 @@
     const saveGroupRecords = (group, pageKey) => {
         try {
             const content = contentApi.readOverrides();
-            const pageContent = currentPageContent(content, pageKey);
-            pageContent.lists[group.id] = Array.from(group.node.querySelectorAll(group.itemSelector)).map(readListItem);
+            const records = Array.from(group.node.querySelectorAll(group.itemSelector)).map(readListItem);
+            contentApi.saveGroupRecords(content, pageKey, group.node.ownerDocument, group, records);
             localStorage.setItem(contentApi.storageKey, JSON.stringify(content));
             return true;
         } catch (error) {
@@ -1066,8 +1066,7 @@
                 return;
             }
             const content = contentApi.readOverrides();
-            const pageContent = currentPageContent(content, activeSelection.pageKey);
-            pageContent.lists[activeSelection.group.id] = records;
+            contentApi.saveGroupRecords(content, activeSelection.pageKey, activeSelection.node.ownerDocument, activeSelection.group, records);
             try {
                 localStorage.setItem(contentApi.storageKey, JSON.stringify(content));
                 activeSelection.pageApi.setMenuItem(activeSelection.node, records[itemIndex]);

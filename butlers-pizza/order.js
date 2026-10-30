@@ -70,17 +70,17 @@
       frame.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden';
       frame.setAttribute('aria-hidden', 'true');
       frame.tabIndex = -1;
-      const timer = setTimeout(() => { frame.remove(); reject(new Error('timeout')); }, 10000);
-      frame.onload = () => {
-        // Give admin-content.js a tick to apply saved price edits.
-        setTimeout(() => {
-          clearTimeout(timer);
-          const doc = frame.contentDocument;
-          const result = doc ? { doc, frame } : null;
-          result ? resolve(result) : reject(new Error('no document'));
-        }, 150);
-      };
-      frame.onerror = () => { clearTimeout(timer); reject(new Error('load failed')); };
+      const timer = setTimeout(() => { clearInterval(poll); frame.remove(); reject(new Error('timeout')); }, 10000);
+      // Poll for DOMContentLoaded rather than load, so slow third-party embeds (the map) can't stall the menu.
+      const poll = setInterval(() => {
+        let doc = null;
+        try { doc = frame.contentDocument; } catch (e) { /* not ready */ }
+        if (!doc || doc.location.href === 'about:blank' || doc.readyState === 'loading' || !doc.querySelector('.menu-item')) return;
+        clearInterval(poll);
+        clearTimeout(timer);
+        setTimeout(() => resolve({ doc, frame }), 100);
+      }, 50);
+      frame.onerror = () => { clearInterval(poll); clearTimeout(timer); reject(new Error('load failed')); };
       frame.src = url;
       document.body.appendChild(frame);
     });

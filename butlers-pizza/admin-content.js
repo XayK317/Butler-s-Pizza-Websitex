@@ -413,6 +413,49 @@
         return item;
     };
 
+    const readMenuRecord = (item) => {
+        if (item.matches("li")) {
+            return {
+                title: item.querySelector("span")?.textContent.trim() || "",
+                description: "",
+                price: item.querySelector("strong")?.textContent.trim() || ""
+            };
+        }
+        return {
+            title: item.querySelector(".item-text h3")?.textContent.trim() || "",
+            description: Array.from(item.querySelectorAll(".item-text p"))
+                .map((paragraph) => paragraph.textContent.trim())
+                .filter(Boolean)
+                .join("\n"),
+            price: item.querySelector(".item-price")?.textContent.trim() || ""
+        };
+    };
+
+    // Lunch specials appear on the home, specials and menu pages; they share one stored list.
+    const sharedKeyOf = (group) => (
+        group.id === "category-lunch-specials" || /^(home|special)-lunch-\d+$/.test(group.id) ? "lunch" : null
+    );
+
+    const saveGroupRecords = (content, pageKey, doc, group, records) => {
+        const key = sharedKeyOf(group);
+        if (!key) {
+            content[pageKey] = content[pageKey] || {};
+            content[pageKey].lists = content[pageKey].lists || {};
+            content[pageKey].lists[group.id] = records;
+            return;
+        }
+        const siblings = getManagedGroups(doc).filter((other) => sharedKeyOf(other) === key);
+        const columns = siblings.map((other) => (
+            other === group ? records : Array.from(other.node.querySelectorAll(other.itemSelector)).map(readMenuRecord)
+        ));
+        const all = columns.flat();
+        content.__shared = content.__shared || {};
+        content.__shared[key] = {
+            records: all,
+            split: siblings.length > 1 ? columns[0].length : Math.ceil(all.length / 2)
+        };
+    };
+
     const applyOverrides = (doc = document) => {
         markGalleryOriginals(doc);
         let content;
@@ -422,10 +465,7 @@
             console.error("Could not read locally saved site content.", error);
             return;
         }
-        const pageContent = content[pageKey(doc)];
-        if (!pageContent) {
-            return;
-        }
+        const pageContent = content[pageKey(doc)] || {};
 
         getPosterGroups(doc).forEach((group) => {
             const rows = pageContent.posterRows?.[group.id];
@@ -478,13 +518,32 @@
             }
         });
 
-        getManagedGroups(doc).forEach((group) => {
+        const managedGroups = getManagedGroups(doc);
+        managedGroups.forEach((group) => {
             const { id, node } = group;
-            const records = pageContent.lists?.[id];
+            let records = pageContent.lists?.[id];
+            const sharedKey = sharedKeyOf(group);
+            const shared = sharedKey ? content.__shared?.[sharedKey] : null;
+            if (shared && Array.isArray(shared.records)) {
+                const siblings = managedGroups.filter((other) => sharedKeyOf(other) === sharedKey);
+                const position = siblings.indexOf(group);
+                records = siblings.length < 2
+                    ? shared.records
+                    : (position === 0 ? shared.records.slice(0, shared.split) : (position === 1 ? shared.records.slice(shared.split) : []));
+            }
             if (!Array.isArray(records)) {
                 return;
             }
             const originalItems = Array.from(node.querySelectorAll(group.itemSelector));
+            const firstTitle = originalItems[0]?.querySelector(".item-text h3")?.textContent || "";
+            const upperCase = shared && firstTitle && firstTitle === firstTitle.toUpperCase();
+            if (upperCase) {
+                records = records.map((record) => ({
+                    ...record,
+                    title: String(record.title || "").toUpperCase(),
+                    description: String(record.description || "").toUpperCase()
+                }));
+            }
             let insertionMarker = null;
             if (originalItems.length === 0 && records.length === 0) {
                 return;
@@ -556,7 +615,8 @@
         pageKey,
         getEditableFields,
         getManagedGroups,
-        setMenuItem,
+        saveGroupRecords,
+        readMenuRecord,
         createGroupItem,
         setPlainText,
         safeUrl,
