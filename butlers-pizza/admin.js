@@ -31,6 +31,10 @@
     const imageDropZone = document.querySelector("#image-drop-zone");
     const linkTools = document.querySelector("#link-tools");
     const itemTools = document.querySelector("#item-tools");
+    const cropTools = document.querySelector("#crop-tools");
+    const cropX = document.querySelector("#crop-x");
+    const cropY = document.querySelector("#crop-y");
+    const cropZoom = document.querySelector("#crop-zoom");
     const contentApi = window.ButlersAdminContent;
     let activeResetToken = "";
     let activeSelection = null;
@@ -252,8 +256,112 @@
         }
     };
 
+    const galleryGroupFor = (doc, pageApi, node) => pageApi.getGalleryGroups(doc)
+        .find((group) => Array.from(group.node.querySelectorAll(group.itemSelector)).some((item) => item.contains(node)));
+
+    const saveGalleryRecords = (group, pageKey, pageApi) => {
+        try {
+            const content = contentApi.readOverrides();
+            const pageContent = currentPageContent(content, pageKey);
+            pageContent.galleries = pageContent.galleries || {};
+            pageContent.galleries[group.id] = Array.from(group.node.querySelectorAll(group.itemSelector))
+                .map(pageApi.readGalleryRecord);
+            localStorage.setItem(contentApi.storageKey, JSON.stringify(content));
+            return true;
+        } catch (error) {
+            console.error("Could not save this gallery.", error);
+            showMessage(selectionMessage, "Could not save this change. Browser storage may be full or unavailable.");
+            return false;
+        }
+    };
+
+    const refreshGalleryControls = (doc, pageApi) => {
+        pageApi.getGalleryGroups(doc).forEach((group) => {
+            const count = group.node.querySelectorAll(group.itemSelector).length;
+            const canDelete = count > group.minimum;
+            if (group.kind === "carousel") {
+                const toolbar = doc.createElement("div");
+                toolbar.className = "admin-control admin-gallery-toolbar";
+                toolbar.innerHTML = '<button type="button" class="admin-control admin-add-photo">+ Add photo</button>'
+                    + (canDelete ? '<button type="button" class="admin-control admin-delete-photo">× Delete this photo</button>' : "");
+                group.node.append(toolbar);
+                return;
+            }
+            group.node.querySelectorAll(group.itemSelector).forEach((item) => {
+                if (!canDelete) {
+                    return;
+                }
+                item.classList.add("admin-has-controls");
+                const deleteButton = doc.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "admin-control admin-delete-photo";
+                deleteButton.textContent = "×";
+                deleteButton.setAttribute("aria-label", "Delete this photo");
+                deleteButton.title = "Delete this photo";
+                item.append(deleteButton);
+            });
+            const addButton = doc.createElement("button");
+            addButton.type = "button";
+            addButton.className = "admin-control admin-add-photo";
+            addButton.textContent = "+ Add photo";
+            group.node.append(addButton);
+        });
+    };
+
+    const addGalleryPhoto = (doc, pageApi, pageKey, button) => {
+        const group = pageApi.getGalleryGroups(doc).find(({ node }) => node.contains(button));
+        if (!group) {
+            return;
+        }
+        const items = Array.from(group.node.querySelectorAll(group.itemSelector));
+        const last = pageApi.readGalleryRecord(items[items.length - 1]);
+        const newItem = pageApi.createGalleryItem(doc, group, { src: last.src, alt: "New photo" });
+        const controls = group.node.querySelector(":scope > .carousel-controls");
+        if (controls) {
+            group.node.insertBefore(newItem, controls);
+        } else {
+            group.node.insertBefore(newItem, group.node.querySelector(":scope > .admin-add-photo"));
+        }
+        if (group.kind === "carousel") {
+            pageApi.syncCarouselIndicators(group.node, items.length);
+        }
+        if (saveGalleryRecords(group, pageKey, pageApi)) {
+            refreshItemControls(doc, pageApi);
+            selectImage({ node: pageApi.galleryImage(newItem) }, pageKey, group, pageApi);
+            selectionMessage.textContent = "Photo added and saved. Replace it with your own photo in the left panel.";
+        }
+    };
+
+    const deleteGalleryPhoto = (doc, pageApi, pageKey, button) => {
+        const group = pageApi.getGalleryGroups(doc).find(({ node }) => node.contains(button));
+        if (!group) {
+            return;
+        }
+        const items = Array.from(group.node.querySelectorAll(group.itemSelector));
+        if (items.length <= group.minimum) {
+            return;
+        }
+        const item = group.kind === "carousel"
+            ? (items.find((slide) => !slide.hidden) || items[0])
+            : button.parentElement;
+        const index = items.indexOf(item);
+        if (activeSelection?.node && item.contains(activeSelection.node)) {
+            clearItemSelection();
+            imageTools.hidden = true;
+        }
+        item.remove();
+        if (group.kind === "carousel") {
+            pageApi.syncCarouselIndicators(group.node, Math.max(0, index - 1));
+        }
+        if (saveGalleryRecords(group, pageKey, pageApi)) {
+            refreshItemControls(doc, pageApi);
+            selectionMessage.textContent = "Photo deleted and saved.";
+        }
+    };
+
     const refreshItemControls = (doc, pageApi) => {
         doc.querySelectorAll(".admin-control").forEach((control) => control.remove());
+        refreshGalleryControls(doc, pageApi);
         pageApi.getManagedGroups(doc).forEach((group) => {
             group.node.querySelectorAll(group.itemSelector).forEach((item) => {
                 item.classList.add("admin-has-controls");
@@ -277,6 +385,15 @@
         });
     };
 
+    const resetSelection = () => {
+        clearItemSelection();
+        imageTools.hidden = true;
+        cropTools.hidden = true;
+        linkTools.hidden = true;
+        selectionHint.textContent = "Click a heading or paragraph in the preview to edit it in place. Select an image to replace it, or click a menu item to edit its details. Use + to add an item to a section and × to delete one.";
+        selectionMessage.textContent = "";
+    };
+
     const clearItemSelection = () => {
         hideSelectedOutline();
         activeSelection = null;
@@ -294,7 +411,8 @@
         if (group.kind === "discount") {
             group.node.append(newItem);
         } else {
-            group.node.insertBefore(newItem, addButton);
+            const links = group.node.querySelector(":scope > .menu-page-links");
+            group.node.insertBefore(newItem, links || addButton);
         }
         if (saveGroupRecords(group, pageKey)) {
             refreshItemControls(doc, pageApi);
@@ -356,6 +474,7 @@
     };
 
     const hideSelectedOutline = () => {
+        activeSelection?.node?.ownerDocument.querySelectorAll(".admin-crop-frame").forEach((frame) => frame.remove());
         if (activeSelection?.node) {
             activeSelection.node.classList.remove("admin-edit-selected");
             activeSelection.node.removeAttribute("contenteditable");
@@ -363,9 +482,9 @@
         }
     };
 
-    const selectImage = (field, pageKey) => {
+    const selectImage = (field, pageKey, group = null, pageApi = null) => {
         hideSelectedOutline();
-        activeSelection = { type: "image", node: field.node, field, pageKey };
+        activeSelection = { type: "image", node: field.node, field, pageKey, group, pageApi };
         field.node.classList.add("admin-edit-selected");
         selectionTitle.textContent = "Replace this image";
         selectionHint.textContent = "Drop an image onto the selected image or the box below, or choose a file. You can also enter a local path or web URL.";
@@ -376,6 +495,20 @@
         imageFile.value = "";
         imageUrl.value = "";
         imageAlt.value = field.node.alt || "";
+        const croppable = Boolean(group || field.node.closest(".about-team-photo"));
+        cropTools.hidden = !croppable;
+        if (croppable) {
+            const doc = field.node.ownerDocument;
+            const frame = doc.createElement("div");
+            frame.className = "admin-control admin-crop-frame";
+            frame.innerHTML = '<svg width="100%" height="100%" aria-hidden="true"><rect x="0" y="0" width="100%" height="100%" fill="none"></rect></svg>';
+            field.node.parentElement.classList.add("admin-has-controls");
+            field.node.parentElement.append(frame);
+            const crop = pageApi.readCrop(field.node);
+            cropX.value = crop.x;
+            cropY.value = crop.y;
+            cropZoom.value = crop.zoom;
+        }
     };
 
     const selectLink = (field, pageKey) => {
@@ -421,6 +554,12 @@
         }
         activeSelection.node.setAttribute("src", safeSource);
         activeSelection.node.setAttribute("alt", alt);
+        if (activeSelection.group) {
+            if (saveGalleryRecords(activeSelection.group, activeSelection.pageKey, activeSelection.pageApi)) {
+                selectionMessage.textContent = "Saved in this browser.";
+            }
+            return;
+        }
         saveField(activeSelection.pageKey, activeSelection.field.id, { src: safeSource, alt });
     };
 
@@ -456,7 +595,16 @@
                 + ".admin-control{font:700 14px/1 sans-serif;cursor:pointer}"
                 + ".admin-delete-item{position:absolute;top:-8px;right:-8px;z-index:5;width:26px;height:26px;padding:0;border:2px solid #fff;border-radius:50%;background:#d13014;color:#fff;font-size:18px}"
                 + ".admin-add-item{grid-column:1/-1;align-self:flex-start;margin:12px auto 0;padding:10px 18px;border:2px dashed #d13014;border-radius:20px;background:rgba(255,255,255,.7);color:#d13014}"
-                + ".admin-add-item:hover,.admin-delete-item:hover{filter:brightness(.9)}";
+                + ".admin-add-item:hover,.admin-delete-item:hover{filter:brightness(.9)}"
+                + ".admin-add-photo{grid-column:1/-1;margin:12px auto 0;padding:10px 18px;border:2px dashed #d13014;border-radius:20px;background:rgba(255,255,255,.85);color:#d13014}"
+                + ".admin-delete-photo{position:absolute;top:4px;right:4px;z-index:6;width:26px;height:26px;padding:0;border:2px solid #fff;border-radius:50%;background:#d13014;color:#fff;font-size:18px}"
+                + ".admin-gallery-toolbar{position:absolute;top:10px;left:10px;z-index:7;display:flex;gap:8px}"
+                + ".admin-gallery-toolbar .admin-add-photo,.admin-gallery-toolbar .admin-delete-photo{position:static;width:auto;height:auto;margin:0;padding:8px 14px;border-radius:20px;font-size:14px}"
+                + ".admin-crop-frame{position:absolute;inset:0;z-index:4;pointer-events:none}"
+                + ".admin-crop-frame svg{display:block;overflow:visible}"
+                + ".admin-crop-frame rect{stroke:#d13014;stroke-width:3;stroke-dasharray:3 8;stroke-linecap:round;animation:admin-crop-march 600ms linear infinite}"
+                + "@keyframes admin-crop-march{to{stroke-dashoffset:-22}}"
+                + ".admin-gallery-toolbar .admin-delete-photo{border-color:#d13014}";
             doc.head.append(style);
         }
         refreshItemControls(doc, pageApi);
@@ -474,7 +622,11 @@
             if (control) {
                 event.preventDefault();
                 event.stopImmediatePropagation();
-                if (control.classList.contains("admin-add-item")) {
+                if (control.classList.contains("admin-add-photo")) {
+                    addGalleryPhoto(doc, pageApi, pageKey, control);
+                } else if (control.classList.contains("admin-delete-photo")) {
+                    deleteGalleryPhoto(doc, pageApi, pageKey, control);
+                } else if (control.classList.contains("admin-add-item")) {
                     addGroupItem(doc, pageApi, pageKey, control);
                 } else {
                     deleteGroupItem(doc, pageApi, pageKey, control);
@@ -493,11 +645,18 @@
             }
             const image = target.closest("img");
             if (image && image.closest("main")) {
+                const galleryGroup = galleryGroupFor(doc, pageApi, image);
+                if (galleryGroup) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    selectImage({ node: image }, pageKey, galleryGroup, pageApi);
+                    return;
+                }
                 const field = pageApi.getEditableFields(doc).find((candidate) => candidate.node === image);
                 if (field) {
                     event.preventDefault();
                     event.stopImmediatePropagation();
-                    selectImage(field, pageKey);
+                    selectImage(field, pageKey, null, pageApi);
                     return;
                 }
             }
@@ -529,6 +688,8 @@
                 linkTools.hidden = true;
                 itemTools.hidden = true;
                 textNode.focus();
+            } else if (activeSelection) {
+                resetSelection();
             }
         }, true);
 
@@ -564,9 +725,15 @@
             const file = event.dataTransfer?.files?.[0];
             if (image?.closest("main") && file) {
                 event.preventDefault();
+                const galleryGroup = galleryGroupFor(doc, pageApi, image);
+                if (galleryGroup) {
+                    selectImage({ node: image }, pageKey, galleryGroup, pageApi);
+                    readImageFile(file);
+                    return;
+                }
                 const field = pageApi.getEditableFields(doc).find((candidate) => candidate.node === image);
                 if (field) {
-                    selectImage(field, pageKey);
+                    selectImage(field, pageKey, null, pageApi);
                     readImageFile(file);
                 }
             }
@@ -598,6 +765,31 @@
         document.querySelector("#save-image").addEventListener("click", () => {
             persistImage(imageUrl.value, imageAlt.value);
         });
+        const applySelectedCrop = (reset = false) => {
+            if (activeSelection?.type !== "image" || cropTools.hidden) {
+                return;
+            }
+            if (reset) {
+                cropX.value = 50;
+                cropY.value = 50;
+                cropZoom.value = 100;
+            }
+            const crop = { x: cropX.value, y: cropY.value, zoom: cropZoom.value };
+            activeSelection.pageApi.applyCrop(activeSelection.node, crop);
+            if (!activeSelection.group) {
+                saveField(activeSelection.pageKey, activeSelection.field.id, {
+                    x: Number(crop.x),
+                    y: Number(crop.y),
+                    zoom: Number(crop.zoom)
+                });
+                return;
+            }
+            if (saveGalleryRecords(activeSelection.group, activeSelection.pageKey, activeSelection.pageApi)) {
+                selectionMessage.textContent = "Crop saved in this browser.";
+            }
+        };
+        [cropX, cropY, cropZoom].forEach((input) => input.addEventListener("input", () => applySelectedCrop()));
+        document.querySelector("#crop-reset").addEventListener("click", () => applySelectedCrop(true));
         linkTools.addEventListener("submit", (event) => {
             event.preventDefault();
             if (!activeSelection || activeSelection.type !== "link") {

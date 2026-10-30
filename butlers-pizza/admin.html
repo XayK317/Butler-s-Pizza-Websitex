@@ -95,6 +95,19 @@
                             <label>Image description (alt text)
                                 <input id="image-alt" type="text">
                             </label>
+                            <div id="crop-tools" hidden>
+                                <p class="crop-title">Crop this photo to fit its layout</p>
+                                <label>Horizontal position
+                                    <input id="crop-x" type="range" min="0" max="100" step="1" value="50">
+                                </label>
+                                <label>Vertical position
+                                    <input id="crop-y" type="range" min="0" max="100" step="1" value="50">
+                                </label>
+                                <label>Zoom
+                                    <input id="crop-zoom" type="range" min="100" max="300" step="5" value="100">
+                                </label>
+                                <button id="crop-reset" type="button">Reset crop</button>
+                            </div>
                             <button id="save-image" type="button">Save image</button>
                         </div>
 

@@ -364,6 +364,9 @@
                 if (typeof changes.alt === "string") {
                     node.setAttribute("alt", changes.alt);
                 }
+                if (node.closest(".about-team-photo") && changes.zoom !== undefined) {
+                    applyCrop(node, changes);
+                }
             } else if (kind === "link") {
                 if (typeof changes.text === "string") {
                     node.textContent = changes.text;
@@ -408,9 +411,45 @@
             });
             insertionMarker?.remove();
         });
+
+        getGalleryGroups(doc).forEach((group) => {
+            const records = pageContent.galleries?.[group.id];
+            if (!Array.isArray(records)) {
+                return;
+            }
+            const validRecords = records.filter((record) => record && typeof record === "object");
+            if (validRecords.length < group.minimum) {
+                return;
+            }
+            const items = Array.from(group.node.querySelectorAll(group.itemSelector));
+            items.splice(validRecords.length).forEach((item) => item.remove());
+            validRecords.forEach((record, index) => {
+                if (items[index]) {
+                    setGalleryRecord(items[index], record, doc.baseURI);
+                    return;
+                }
+                const newItem = createGalleryItem(doc, group, record);
+                const controls = group.node.querySelector(":scope > .carousel-controls");
+                if (controls) {
+                    group.node.insertBefore(newItem, controls);
+                } else {
+                    group.node.append(newItem);
+                }
+            });
+            if (group.kind === "carousel") {
+                syncCarouselIndicators(group.node, 0);
+            }
+        });
     };
 
     window.ButlersAdminContent = {
+        getGalleryGroups,
+        galleryImage,
+        readCrop,
+        applyCrop,
+        readGalleryRecord,
+        createGalleryItem,
+        syncCarouselIndicators,
         storageKey,
         readOverrides,
         pageKey,

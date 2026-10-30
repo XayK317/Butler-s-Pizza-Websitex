@@ -99,8 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.querySelectorAll("[data-carousel]").forEach((carousel) => {
-        const slides = Array.from(carousel.querySelectorAll(".carousel-slide"));
-        const indicators = Array.from(carousel.querySelectorAll("[data-carousel-slide]"));
+        let slides = Array.from(carousel.querySelectorAll(":scope > .carousel-slide"));
+        let indicators = Array.from(carousel.querySelectorAll("[data-carousel-slide]"));
 
         if (slides.length === 0 || indicators.length !== slides.length) {
             return;
@@ -160,8 +160,18 @@ document.addEventListener("DOMContentLoaded", () => {
             showSlide(activeIndex + 1);
         });
 
-        indicators.forEach((indicator, index) => {
-            indicator.addEventListener("click", () => showSlide(index));
+        carousel.addEventListener("click", (event) => {
+            const indicator = event.target.closest?.("[data-carousel-slide]");
+            if (indicator && carousel.contains(indicator)) {
+                showSlide(Number(indicator.dataset.carouselSlide));
+            }
+        });
+
+        carousel.addEventListener("carousel:refresh", () => {
+            slides = Array.from(carousel.querySelectorAll(":scope > .carousel-slide"));
+            indicators = Array.from(carousel.querySelectorAll("[data-carousel-slide]"));
+            const visibleIndex = slides.findIndex((slide) => !slide.hidden);
+            showSlide(visibleIndex < 0 ? 0 : visibleIndex);
         });
 
         carousel.addEventListener("pointerenter", pauseAutoplay);
