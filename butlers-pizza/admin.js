@@ -591,6 +591,29 @@
         }
     };
 
+    const addSelectionFrame = (node) => {
+        const doc = node.ownerDocument;
+        const win = doc.defaultView;
+        const frame = doc.createElement("div");
+        frame.className = "admin-control admin-crop-frame";
+        frame.innerHTML = '<svg width="100%" height="100%" aria-hidden="true"><rect x="0" y="0" width="100%" height="100%" fill="none"></rect></svg>';
+        frame.style.inset = "auto";
+        frame.style.zIndex = "50";
+        doc.body.append(frame);
+        const place = () => {
+            if (!frame.isConnected) {
+                return;
+            }
+            const rect = node.getBoundingClientRect();
+            frame.style.left = `${rect.left + win.scrollX - 4}px`;
+            frame.style.top = `${rect.top + win.scrollY - 4}px`;
+            frame.style.width = `${rect.width + 8}px`;
+            frame.style.height = `${rect.height + 8}px`;
+            win.requestAnimationFrame(place);
+        };
+        place();
+    };
+
     const selectImage = (field, pageKey, group = null, pageApi = null) => {
         hideSelectedOutline();
         activeSelection = { type: "image", node: field.node, field, pageKey, group, pageApi };
@@ -624,6 +647,7 @@
         hideSelectedOutline();
         activeSelection = { type: "link", node: field.node, field, pageKey };
         field.node.classList.add("admin-edit-selected");
+        addSelectionFrame(field.node);
         selectionTitle.textContent = "Edit link";
         selectionHint.textContent = "Update the link text or its destination in the left panel.";
         selectionMessage.textContent = "";
@@ -638,6 +662,7 @@
         hideSelectedOutline();
         activeSelection = { type: "item", node: item, group, pageKey, pageApi };
         item.classList.add("admin-edit-selected");
+        addSelectionFrame(item);
         selectionTitle.textContent = "Edit menu item";
         selectionHint.textContent = "Edit this item's title, description, or price here.";
         selectionMessage.textContent = "";
@@ -699,7 +724,7 @@
         if (!doc.querySelector("#admin-preview-style")) {
             const style = doc.createElement("style");
             style.id = "admin-preview-style";
-            style.textContent = ".admin-edit-selected{outline:3px solid #d13014!important;outline-offset:3px;cursor:text}.admin-edit-selected img{outline:3px solid #d13014!important;outline-offset:3px}"
+            style.textContent = ".admin-edit-selected{outline:none!important;cursor:text}.admin-edit-selected img{outline:3px solid #d13014!important;outline-offset:3px}"
                 + ".admin-has-controls{position:relative}"
                 + ".admin-control{font:700 14px/1 sans-serif;cursor:pointer}"
                 + ".admin-delete-item{position:absolute;top:-8px;right:-8px;z-index:5;width:26px;height:26px;padding:0;border:2px solid #fff;border-radius:50%;background:#d13014;color:#fff;font-size:18px}"
@@ -802,6 +827,7 @@
                 hideSelectedOutline();
                 activeSelection = { type: "text", node: textNode, field, pageKey };
                 textNode.classList.add("admin-edit-selected");
+                addSelectionFrame(textNode);
                 textNode.setAttribute("contenteditable", "true");
                 textNode.setAttribute("data-admin-editing", "true");
                 selectionTitle.textContent = "Edit text in the preview";
