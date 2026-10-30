@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Online | Butler's Pizza</title>
+    <link rel="icon" type="image/png" href="assets/bplogo.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="order.css">
+</head>
+<body>
+    <div class="page-container">
+        <header class="site-header">
+            <a class="brand-logo" href="index.html" aria-label="Butler's Pizza home">
+                <span class="logo-top">BUTLER'S</span>
+                <span class="logo-bottom">PIZZA</span>
+            </a>
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="menu.html">MENU</a>
+                <a href="specials.html">SPECIALS</a>
+                <a href="about.html">ABOUT / MEDIA</a>
+                <a href="catering.html">CATERING</a>
+                <a href="faq.html">FAQ's</a>
+            </nav>
+            <a href="order.html" class="order-btn" aria-current="page">ORDER</a>
+        </header>
+
+        <main class="order-page">
+            <h1 class="order-title">ORDER ONLINE</h1>
+            <p class="order-subtitle">Pickup at 1220 Waterway Blvd · Indianapolis, IN 46202 · Open daily 11am–8pm</p>
+
+            <section class="when-bar" aria-live="polite">
+                <div>
+                    <strong>Pickup time</strong>
+                    <span id="when-summary">Not chosen yet</span>
+                </div>
+                <button type="button" class="order-link-button" id="change-when">Choose pickup time</button>
+            </section>
+
+            <div class="order-layout">
+                <section class="order-menu" aria-label="Menu">
+                    <div class="order-tabs" id="order-tabs" role="tablist" aria-label="Menu sections"></div>
+                    <p class="order-status" id="menu-status">Loading the menu…</p>
+                    <div id="menu-list"></div>
+                </section>
+
+                <aside class="order-cart" aria-label="Your order">
+                    <h2>Your Order</h2>
+                    <div id="cart-empty" class="cart-empty">Your cart is empty. Add something from the menu.</div>
+                    <ul id="cart-lines" class="cart-lines"></ul>
+                    <div class="cart-total" id="cart-total" hidden>
+                        <span>Subtotal</span><strong id="cart-subtotal">$0.00</strong>
+                    </div>
+                    <p class="cart-note" id="cart-note" hidden>Sales tax is added when you pick up. Pay at the counter.</p>
+
+                    <form id="checkout-form" class="checkout-form" hidden novalidate>
+                        <h3>Pickup details</h3>
+                        <label>Name<input name="name" type="text" autocomplete="name" required maxlength="60"></label>
+                        <label>Phone<input name="phone" type="tel" autocomplete="tel" required maxlength="20" inputmode="tel"></label>
+                        <label>Email (optional)<input name="email" type="email" autocomplete="email" maxlength="80"></label>
+                        <label>Coupon or deal (optional)
+                            <select name="coupon" id="coupon-select"><option value="">None</option></select>
+                        </label>
+                        <label>Order notes (optional)<textarea name="notes" rows="2" maxlength="300"></textarea></label>
+                        <p class="form-error" id="form-error" role="alert" hidden></p>
+                        <button type="submit" class="order-primary">Place order</button>
+                    </form>
+                    <button type="button" class="order-primary" id="start-checkout" hidden>Checkout</button>
+                </aside>
+            </div>
+
+            <section class="order-confirm" id="order-confirm" hidden aria-live="polite" tabindex="-1">
+                <h2>Thank you, <span id="confirm-name"></span>!</h2>
+                <p>Your order <strong id="confirm-number"></strong> is placed for pickup <strong id="confirm-when"></strong>.</p>
+                <ul id="confirm-lines" class="cart-lines"></ul>
+                <p class="cart-total"><span>Subtotal</span><strong id="confirm-total"></strong></p>
+                <p class="cart-note">Pay at the counter when you pick up. Questions? Call 317-600-5463 or 317-600-8793.</p>
+                <div class="confirm-actions">
+                    <a class="order-primary" id="confirm-email" href="#">Email this order to the restaurant</a>
+                    <button type="button" class="order-secondary" id="new-order">Start a new order</button>
+                </div>
+            </section>
+        </main>
+
+        <dialog class="when-dialog" id="when-dialog" aria-labelledby="when-title">
+            <form method="dialog" id="when-form">
+                <h2 id="when-title">When would you like your order?</h2>
+                <label class="when-option"><input type="radio" name="when" value="now"><span><strong>Order now</strong><small id="now-hint">Ready in about 20–30 minutes</small></span></label>
+                <label class="when-option"><input type="radio" name="when" value="later"><span><strong>Order for later</strong><small>Schedule a pickup day and time</small></span></label>
+                <div class="when-later" id="when-later" hidden>
+                    <label>Day<select id="when-date"></select></label>
+                    <label>Time<select id="when-time"></select></label>
+                </div>
+                <p class="form-error" id="when-error" role="alert" hidden></p>
+                <div class="confirm-actions">
+                    <button type="submit" class="order-primary" id="when-save">Continue</button>
+                    <button type="button" class="order-secondary" id="when-cancel">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+
+        <footer class="site-footer" id="visit">
+            <div class="footer-content-wrapper">
+                <div class="footer-info">
+                    <h2 class="footer-section-title">VISIT US</h2>
+                    <div class="footer-block">
+                        <h4>BUTLER'S PIZZA</h4>
+                        <p>1220 WATERWAY BLVD, INDIANAPOLIS, INDIANA 46202, UNITED STATES</p>
+                        <p class="phone-number">317-500-5463 OR 317-600-8793</p>
+                    </div>
+                    <div class="footer-block">
+                        <h4>HOURS</h4>
+                        <p>Mon–Sun: 11:00 am–8:00 pm<br>Holiday hours may vary</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script src="order.js"></script>
+</body>
+</html>
