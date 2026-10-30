@@ -11,13 +11,93 @@
         return currentPath.substring(currentPath.lastIndexOf("/") + 1) || "index.html";
     };
 
+    const getPosterGroups = (doc = document) => {
+        const specs = [
+            [".sig .cols", ":scope > .item"],
+            [".lunch .cols > div", ":scope > .item"],
+            [".sand .cols > div", ":scope > .item"],
+            [".sig .grid", ":scope > .row:not(.head)"],
+            [".sand .lower > div", ":scope > .line"]
+        ];
+        const groups = [];
+        specs.forEach(([selector, itemSelector]) => {
+            doc.querySelectorAll(selector).forEach((node) => {
+                groups.push({ id: `poster-${groups.length}`, node, itemSelector, kind: "poster" });
+            });
+        });
+        return groups;
+    };
+
+    const readPosterRow = (item) => {
+        const clone = item.cloneNode(true);
+        clone.querySelectorAll(".admin-control").forEach((control) => control.remove());
+        [clone, ...clone.querySelectorAll("*")].forEach((node) => {
+            node.classList.remove("admin-edit-selected", "admin-has-controls");
+            node.removeAttribute("contenteditable");
+            node.removeAttribute("data-admin-editing");
+            if (!node.getAttribute("class")) {
+                node.removeAttribute("class");
+            }
+        });
+        return clone.outerHTML;
+    };
+
+    const parsePosterRow = (doc, html) => {
+        const template = doc.createElement("template");
+        template.innerHTML = html;
+        template.content.querySelectorAll("script, iframe, object, embed, link, style").forEach((node) => node.remove());
+        template.content.querySelectorAll("*").forEach((node) => {
+            Array.from(node.attributes).forEach((attribute) => {
+                if (/^on/i.test(attribute.name)) {
+                    node.removeAttribute(attribute.name);
+                }
+            });
+        });
+        return template.content.firstElementChild;
+    };
+
+    const createPosterRow = (doc, group) => {
+        const items = Array.from(group.node.querySelectorAll(group.itemSelector));
+        const template = items.reduce((best, item) => (
+            item.querySelectorAll("p, h3").length >= best.querySelectorAll("p, h3").length ? item : best
+        ), items[0]);
+        const item = parsePosterRow(doc, readPosterRow(template));
+        item.classList.remove("center");
+        if (item.matches(".item")) {
+            item.querySelectorAll("h3").forEach((node) => setPlainText(node, "New Item"));
+            item.querySelectorAll("p").forEach((node) => {
+                setPlainText(node, node.classList.contains("price") ? "$0.00" : "Describe this item.");
+            });
+        } else {
+            item.querySelectorAll("p").forEach((node, index) => setPlainText(node, index === 0 ? "New Item" : "$0.00"));
+        }
+        return item;
+    };
+
     const getEditableFields = (doc = document) => {
         const fieldNodes = Array.from(doc.querySelectorAll(
             "main h1, main h2, main h3, main h4, main p, footer h2, footer h4, footer p, .media-cta, .amp-link, .map-directions"
         )).filter((node) => !node.closest(".menu-item"));
         const tagIndexes = new Map();
+        const posterGroups = getPosterGroups(doc);
+        const posterCounts = new Map();
         const fields = fieldNodes.map((node) => {
             const tagName = node.tagName.toLowerCase();
+            // Poster rows are saved as a whole, so their text gets ids that never shift other fields.
+            const posterGroup = posterGroups.find((group) => (
+                Array.from(group.node.querySelectorAll(group.itemSelector)).some((item) => item.contains(node))
+            ));
+            if (posterGroup) {
+                const count = posterCounts.get(posterGroup.id) || 0;
+                posterCounts.set(posterGroup.id, count + 1);
+                return {
+                    id: `${posterGroup.id}-text-${count}`,
+                    kind: "text",
+                    node,
+                    posterGroup,
+                    label: `${tagName.toUpperCase()}: ${node.textContent.trim().slice(0, 60)}`
+                };
+            }
             const index = tagIndexes.get(tagName) || 0;
             tagIndexes.set(tagName, index + 1);
             return {
@@ -347,9 +427,27 @@
             return;
         }
 
-        getEditableFields(doc).forEach(({ id, kind, node }) => {
+        getPosterGroups(doc).forEach((group) => {
+            const rows = pageContent.posterRows?.[group.id];
+            if (!Array.isArray(rows)) {
+                return;
+            }
+            const items = Array.from(group.node.querySelectorAll(group.itemSelector));
+            const marker = doc.createComment("");
+            group.node.insertBefore(marker, items[0] || null);
+            items.forEach((item) => item.remove());
+            rows.forEach((html) => {
+                const row = typeof html === "string" ? parsePosterRow(doc, html) : null;
+                if (row) {
+                    group.node.insertBefore(row, marker);
+                }
+            });
+            marker.remove();
+        });
+
+        getEditableFields(doc).forEach(({ id, kind, node, posterGroup }) => {
             const changes = pageContent.fields?.[id];
-            if (!changes) {
+            if (!changes || posterGroup) {
                 return;
             }
             if (kind === "text" && typeof changes.text === "string") {
@@ -444,6 +542,9 @@
 
     window.ButlersAdminContent = {
         getGalleryGroups,
+        getPosterGroups,
+        readPosterRow,
+        createPosterRow,
         galleryImage,
         readCrop,
         applyCrop,

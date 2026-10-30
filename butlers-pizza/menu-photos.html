@@ -28,7 +28,7 @@
             color: #111;
         }
         .poster .top-border { position: absolute; top: 0; left: 0; right: 0; height: 18px; background: #d13014; }
-        .poster .page { position: absolute; top: 18px; left: 0; right: 0; bottom: 0; padding: 14px 70px 0; }
+        .poster .page { position: absolute; top: 18px; left: 0; right: 0; bottom: 0; padding: 14px 70px 0; transform-origin: top center; }
         .poster h1, .poster h2 { font-family: "Kaushan Script", cursive; font-weight: 400; color: #d13014; text-align: center; letter-spacing: 1px; }
         .poster h3 { font-family: Arial, Helvetica, sans-serif; }
         .poster h1 { font-size: 56px; line-height: 1.1; }
@@ -81,7 +81,7 @@
         .sand .line p:last-child { font-weight: 900; white-space: nowrap; }
         .sand .sauces { font-size: 17px; font-weight: 800; margin-top: 8px; }
 
-        .poster-art { position: absolute; top: 18px; left: 0; right: 0; bottom: 0; overflow: hidden; background: #f4ab2e; }
+        .poster-art { position: absolute !important; top: 18px; left: 0; right: 0; bottom: 0; overflow: hidden; background: #f4ab2e; }
         .poster-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
         .poster-art .tint { position: absolute; inset: 0; background: rgba(244, 171, 46, 0.84); pointer-events: none; }
     </style>
@@ -227,13 +227,43 @@
             const fit = () => {
                 const scale = Math.min(1, (document.documentElement.clientWidth - 32) / 1365);
                 document.querySelectorAll(".poster-frame").forEach((frame) => {
-                    frame.style.height = `${768 * scale}px`;
-                    frame.querySelector(".poster").style.transform = `scale(${scale})`;
-                    frame.querySelector(".poster").style.transformOrigin = "top left";
+                    const poster = frame.querySelector(".poster");
+                    frame.style.height = `${poster.offsetHeight * scale}px`;
+                    poster.style.transform = `scale(${scale})`;
+                    poster.style.transformOrigin = "top left";
                 });
             };
             fit();
             window.addEventListener("resize", fit);
+
+            // Lowest edge any picture's content may reach (the Signature gluten-free note).
+            const contentLimit = 712;
+            const layoutPosters = () => {
+                document.querySelectorAll(".sig .cols").forEach((cols) => {
+                    const items = Array.from(cols.querySelectorAll(":scope > .item"));
+                    items.forEach((item, index) => {
+                        item.classList.toggle("center", items.length % 2 === 1 && index === items.length - 1);
+                    });
+                });
+                document.querySelectorAll(".poster .page").forEach((page) => {
+                    page.style.transform = "";
+                    const last = Array.from(page.children).filter((node) => !node.classList.contains("admin-control")).pop();
+                    if (!last) {
+                        return;
+                    }
+                    const bottom = last.offsetTop + last.offsetHeight;
+                    const scale = Math.min(1, (contentLimit - 18) / bottom);
+                    if (scale < 0.999) {
+                        page.style.transform = `scale(${scale})`;
+                    }
+                });
+            };
+            layoutPosters();
+            window.addEventListener("load", layoutPosters);
+            if (document.fonts?.ready) {
+                document.fonts.ready.then(layoutPosters);
+            }
+            new MutationObserver(layoutPosters).observe(document.querySelector("main"), { childList: true, subtree: true, characterData: true });
         })();
     </script>
 </body>

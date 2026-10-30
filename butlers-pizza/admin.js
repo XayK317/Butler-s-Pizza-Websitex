@@ -364,6 +364,25 @@
     const refreshItemControls = (doc, pageApi) => {
         doc.querySelectorAll(".admin-control").forEach((control) => control.remove());
         refreshGalleryControls(doc, pageApi);
+        pageApi.getPosterGroups(doc).forEach((group) => {
+            const items = Array.from(group.node.querySelectorAll(group.itemSelector));
+            if (items.length > 1) {
+                items.forEach((item) => {
+                    item.classList.add("admin-has-controls");
+                    const deleteButton = doc.createElement("button");
+                    deleteButton.type = "button";
+                    deleteButton.className = "admin-control admin-delete-item admin-poster-delete";
+                    deleteButton.textContent = "×";
+                    deleteButton.setAttribute("aria-label", "Delete this row");
+                    deleteButton.title = "Delete this row";
+                    item.append(deleteButton);
+                });
+            }
+            const addWrap = doc.createElement("div");
+            addWrap.className = "admin-control admin-poster-add-wrap";
+            addWrap.innerHTML = '<button type="button" class="admin-control admin-add-item admin-poster-add">+ Add row</button>';
+            group.node.append(addWrap);
+        });
         pageApi.getManagedGroups(doc).forEach((group) => {
             group.node.querySelectorAll(group.itemSelector).forEach((item) => {
                 item.classList.add("admin-has-controls");
@@ -440,6 +459,52 @@
         }
     };
 
+    const savePosterRows = (group, pageKey, pageApi) => {
+        try {
+            const content = contentApi.readOverrides();
+            const pageContent = currentPageContent(content, pageKey);
+            pageContent.posterRows = pageContent.posterRows || {};
+            pageContent.posterRows[group.id] = Array.from(group.node.querySelectorAll(group.itemSelector))
+                .map(pageApi.readPosterRow);
+            localStorage.setItem(contentApi.storageKey, JSON.stringify(content));
+            selectionMessage.textContent = "Saved in this browser.";
+            return true;
+        } catch (error) {
+            console.error("Could not save this section.", error);
+            showMessage(selectionMessage, "Could not save this change. Browser storage may be full or unavailable.");
+            return false;
+        }
+    };
+
+    const addPosterRow = (doc, pageApi, pageKey, button) => {
+        const group = pageApi.getPosterGroups(doc).find(({ node }) => node === button.parentElement.parentElement);
+        if (!group) {
+            return;
+        }
+        const newItem = pageApi.createPosterRow(doc, group);
+        group.node.insertBefore(newItem, button.parentElement);
+        if (savePosterRows(group, pageKey, pageApi)) {
+            refreshItemControls(doc, pageApi);
+            selectionMessage.textContent = "Row added and saved. Click its text to edit it.";
+        }
+    };
+
+    const deletePosterRow = (doc, pageApi, pageKey, button) => {
+        const item = button.parentElement;
+        const group = pageApi.getPosterGroups(doc).find(({ node }) => node === item.parentElement);
+        if (!group || group.node.querySelectorAll(group.itemSelector).length <= 1) {
+            return;
+        }
+        if (activeSelection?.node && item.contains(activeSelection.node)) {
+            clearItemSelection();
+        }
+        item.remove();
+        if (savePosterRows(group, pageKey, pageApi)) {
+            refreshItemControls(doc, pageApi);
+            selectionMessage.textContent = "Row deleted and saved.";
+        }
+    };
+
     const setDownloadsEnabled = (enabled) => {
         photoDownloads.querySelectorAll("button").forEach((button) => {
             button.disabled = !enabled;
@@ -480,15 +545,16 @@
         const doc = poster.ownerDocument;
         const css = doc.querySelector("#poster-style").textContent + (doc.defaultView.MENU_PHOTO_FONT || "");
         const body = new XMLSerializer().serializeToString(clone);
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1365" height="768"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>${css.replace(/\]\]>/g, "")}</style>${body}</div></foreignObject></svg>`;
+        const height = poster.offsetHeight || 768;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1365" height="${height}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>${css.replace(/\]\]>/g, "")}</style>${body}</div></foreignObject></svg>`;
         const image = new Image();
         image.onload = () => {
             const canvas = document.createElement("canvas");
             canvas.width = 2730;
-            canvas.height = 1536;
+            canvas.height = height * 2;
             const context = canvas.getContext("2d");
             context.scale(2, 2);
-            context.drawImage(image, 0, 0, 1365, 768);
+            context.drawImage(image, 0, 0, 1365, height);
             canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not create the image."))), "image/png");
         };
         image.onerror = () => reject(new Error("Could not render the photo."));
@@ -553,7 +619,7 @@
         photoDownloads.hidden = pageKey !== "menu-photos.html";
         if (!photoDownloads.hidden) {
             const saved = pageApi.readOverrides()[pageKey];
-            setDownloadsEnabled(Boolean(saved && Object.keys(saved.fields || {}).length));
+            setDownloadsEnabled(Boolean(saved && (Object.keys(saved.fields || {}).length || Object.keys(saved.posterRows || {}).length)));
         }
         selectionTitle.textContent = "Edit the page";
         selectionHint.textContent = "Click a heading or paragraph in the preview to edit it in place. Select an image to replace it, or click a menu item to edit its details. Use + to add an item to a section and × to delete one.";
@@ -730,6 +796,9 @@
                 + ".admin-delete-item{position:absolute;top:-8px;right:-8px;z-index:5;width:26px;height:26px;padding:0;border:2px solid #fff;border-radius:50%;background:#d13014;color:#fff;font-size:18px}"
                 + ".admin-add-item{grid-column:1/-1;align-self:flex-start;margin:12px auto 0;padding:10px 18px;border:2px dashed #d13014;border-radius:20px;background:rgba(255,255,255,.7);color:#d13014}"
                 + ".admin-add-item:hover,.admin-delete-item:hover{filter:brightness(.9)}"
+                + ".admin-poster-add-wrap{grid-column:1/-1;position:relative;height:0;margin:0;padding:0;text-align:center;z-index:6}"
+                + ".admin-poster-add-wrap .admin-poster-add{position:absolute;right:0;top:2px;margin:0;white-space:nowrap;padding:4px 10px;font-size:12px}"
+                + ".admin-poster-delete{top:2px;right:-26px}"
                 + ".admin-add-photo{grid-column:1/-1;margin:12px auto 0;padding:10px 18px;border:2px dashed #d13014;border-radius:20px;background:rgba(255,255,255,.85);color:#d13014}"
                 + ".admin-delete-photo{position:absolute;top:4px;right:4px;z-index:6;width:26px;height:26px;padding:0;border:2px solid #fff;border-radius:50%;background:#d13014;color:#fff;font-size:18px}"
                 + ".admin-gallery-toolbar{position:absolute;top:10px;left:10px;z-index:7;display:flex;gap:8px}"
@@ -774,6 +843,10 @@
                     addGalleryPhoto(doc, pageApi, pageKey, control);
                 } else if (control.classList.contains("admin-delete-photo")) {
                     deleteGalleryPhoto(doc, pageApi, pageKey, control);
+                } else if (control.classList.contains("admin-poster-add")) {
+                    addPosterRow(doc, pageApi, pageKey, control);
+                } else if (control.classList.contains("admin-poster-delete")) {
+                    deletePosterRow(doc, pageApi, pageKey, control);
                 } else if (control.classList.contains("admin-add-item")) {
                     addGroupItem(doc, pageApi, pageKey, control);
                 } else {
@@ -856,7 +929,11 @@
                 if (field) {
                     const value = target.innerText.replace(/\u00a0/g, " ").trim();
                     pageApi.setPlainText(target, value);
-                    saveField(pageKey, field.id, { text: value });
+                    if (field.posterGroup) {
+                        savePosterRows(field.posterGroup, pageKey, pageApi);
+                    } else {
+                        saveField(pageKey, field.id, { text: value });
+                    }
                     target.removeAttribute("contenteditable");
                     target.removeAttribute("data-admin-editing");
                 }
