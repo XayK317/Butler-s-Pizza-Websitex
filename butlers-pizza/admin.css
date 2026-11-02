@@ -126,13 +126,40 @@ textarea {
 }
 
 .secondary-button {
-    border-color: #b7ad94;
-    background: transparent;
-    color: var(--admin-cream);
+    border-color: #090909;
+    background: var(--admin-cream);
+    color: #1b1a18;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
 }
 
 .secondary-button:hover {
-    background: rgb(234 222 188 / 12%);
+    background: #fff6d8;
+}
+
+.secondary-button:disabled {
+    border-color: #6f695b;
+    background: #4a463d;
+    color: #d9d2bd;
+    cursor: not-allowed;
+}
+
+#photo-downloads button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    text-align: center;
+}
+
+#photo-download-status {
+    color: #f4efdb;
+    line-height: 1.45;
+}
+
+#account-change-start {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
 }
 
 #reset-request-button {
