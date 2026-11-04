@@ -1,5 +1,9 @@
 @use "info-components";
 
+.info-page > p a[href^="tel:"] {
+    color: var(--accent-red);
+    text-decoration: underline;
+}
 
 .catering-inquiry {
     max-width: 900px;

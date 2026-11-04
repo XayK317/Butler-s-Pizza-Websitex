@@ -11,6 +11,11 @@
   font-weight: bold;
 }
 
+.info-page > p a[href^="tel:"] {
+  color: var(--accent-red);
+  text-decoration: underline;
+}
+
 .catering-inquiry {
   max-width: 900px;
   margin: 56px auto 0;
