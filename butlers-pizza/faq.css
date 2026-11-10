@@ -42,6 +42,10 @@
   font-weight: bold;
 }
 
+.faq-list details p a[href^="tel:"] {
+  text-decoration: underline;
+}
+
 .job-application {
   max-width: 900px;
   margin: 56px auto 0;
