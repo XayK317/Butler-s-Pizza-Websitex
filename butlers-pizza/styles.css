@@ -272,7 +272,7 @@ h6,
   bottom: 0;
   left: 50%;
   z-index: 0;
-  width: 100%;
+  width: 100vw;
   padding-inline: calc(40px + var(--wide-page-inset));
   transform: translateX(-50%);
   clip-path: inset(var(--footer-reveal-clip, 50%) 0 0 0);
