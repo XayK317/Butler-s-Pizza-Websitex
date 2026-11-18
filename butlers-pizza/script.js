@@ -34,6 +34,14 @@ document.addEventListener("keyup", (event) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+    const specialsAnchorId = window.location.hash.slice(1);
+    if (["lunch-specials", "discounts"].includes(specialsAnchorId)) {
+        const specialsAnchor = document.getElementById(specialsAnchorId);
+        if (specialsAnchor) {
+            window.requestAnimationFrame(() => specialsAnchor.scrollIntoView({ block: "center" }));
+        }
+    }
+
     const siteHeader = document.querySelector(".site-header");
     if (siteHeader) {
         const navToggle = siteHeader.querySelector(".nav-toggle");
