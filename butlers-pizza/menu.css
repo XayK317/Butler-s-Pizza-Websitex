@@ -113,6 +113,11 @@
   column-gap: 36px;
 }
 
+#drinks .menu-category-items {
+  grid-auto-flow: column;
+  grid-template-rows: repeat(12, auto);
+}
+
 .menu-category {
   scroll-margin-top: 110px;
 }
@@ -144,6 +149,10 @@
 @media (max-width: 600px) {
   .menu-category-items {
     grid-template-columns: 1fr;
+  }
+  #drinks .menu-category-items {
+    grid-auto-flow: row;
+    grid-template-rows: none;
   }
   .menu-category-nav {
     gap: 6px 12px;
