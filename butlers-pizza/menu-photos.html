@@ -92,7 +92,10 @@
             <span class="logo-top">BUTLER'S</span>
             <span class="logo-bottom">PIZZA</span>
         </div>
-        <nav class="nav-links">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">
+            <span aria-hidden="true">&#9776;</span> <span class="nav-current-page">MENU</span>
+        </button>
+        <nav id="main-navigation" class="nav-links" aria-label="Main navigation">
             <a href="menu.html">MENU</a>
             <a href="specials.html">SPECIALS</a>
             <a href="about.html">ABOUT / MEDIA</a>
@@ -219,6 +222,7 @@
     </script>
     <script src="menu-photos-font.js"></script>
     <script src="admin-content.js"></script>
+    <script src="script.js"></script>
     <script>
         (() => {
             const fontStyle = document.createElement("style");

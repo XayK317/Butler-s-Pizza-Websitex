@@ -36,6 +36,43 @@ document.addEventListener("keyup", (event) => {
 document.addEventListener("DOMContentLoaded", () => {
     const siteHeader = document.querySelector(".site-header");
     if (siteHeader) {
+        const navToggle = siteHeader.querySelector(".nav-toggle");
+        const navigation = siteHeader.querySelector(".nav-links");
+        if (navToggle && navigation) {
+            const currentPageLabel = navToggle.querySelector(".nav-current-page");
+            const currentPage = siteHeader.querySelector('[aria-current="page"]');
+            const pageName = currentPage ? currentPage.textContent.trim() : "HOME";
+            if (currentPageLabel) {
+                currentPageLabel.textContent = pageName;
+            }
+            navToggle.setAttribute("aria-label", `Navigation, current page: ${pageName}`);
+            const closeNavigation = () => {
+                siteHeader.classList.remove("nav-open");
+                navToggle.setAttribute("aria-expanded", "false");
+            };
+            navToggle.addEventListener("click", () => {
+                const isOpen = siteHeader.classList.toggle("nav-open");
+                navToggle.setAttribute("aria-expanded", String(isOpen));
+            });
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape" && siteHeader.classList.contains("nav-open")) {
+                    closeNavigation();
+                    navToggle.focus();
+                }
+            });
+            document.addEventListener("click", (event) => {
+                if (!siteHeader.contains(event.target)) {
+                    closeNavigation();
+                }
+            });
+            navigation.addEventListener("click", (event) => {
+                if (event.target.closest("a")) {
+                    closeNavigation();
+                }
+            });
+            window.matchMedia("(min-width: 901px)").addEventListener("change", closeNavigation);
+            siteHeader.classList.add("nav-ready");
+        }
         const updateStickyHeaderHeight = () => {
             document.documentElement.style.setProperty(
                 "--sticky-header-height",
