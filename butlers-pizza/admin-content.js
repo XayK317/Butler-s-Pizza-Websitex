@@ -364,6 +364,30 @@
         });
     };
 
+    const setTextPreservingPhoneLinks = (node, value) => {
+        const links = Array.from(node.querySelectorAll('a[href^="tel:"]'))
+            .filter((link) => link.textContent);
+        setPlainText(node, value);
+
+        Array.from(node.childNodes).filter((child) => child.nodeType === 3).forEach((textNode) => {
+            let remaining = textNode.textContent;
+            const fragment = node.ownerDocument.createDocumentFragment();
+            while (remaining) {
+                const match = links
+                    .map((link) => ({ link, index: remaining.indexOf(link.textContent) }))
+                    .filter(({ index }) => index !== -1)
+                    .sort((a, b) => a.index - b.index)[0];
+                if (!match) {
+                    fragment.append(remaining);
+                    break;
+                }
+                fragment.append(remaining.slice(0, match.index), match.link.cloneNode(true));
+                remaining = remaining.slice(match.index + match.link.textContent.length);
+            }
+            textNode.replaceWith(fragment);
+        });
+    };
+
     const setMenuItem = (item, record) => {
         if (item.matches("li")) {
             let label = item.querySelector("span");
@@ -507,7 +531,11 @@
                 return;
             }
             if (kind === "text" && typeof changes.text === "string") {
-                setPlainText(node, changes.text);
+                if (node.hasAttribute("data-preserve-phone-links")) {
+                    setTextPreservingPhoneLinks(node, changes.text);
+                } else {
+                    setPlainText(node, changes.text);
+                }
             } else if (kind === "image") {
                 if (typeof changes.src === "string") {
                     const source = safeUrl(changes.src, doc.baseURI);
